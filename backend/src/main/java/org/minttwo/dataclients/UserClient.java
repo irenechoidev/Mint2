@@ -11,4 +11,8 @@ public class UserClient extends DataClient<User> {
     public void createUser(@NonNull User user) {
         this.insert(user);
     }
+
+    public User getUserById(@NonNull String id) {
+        return this.getById(User.class, id);
+    }
 }
