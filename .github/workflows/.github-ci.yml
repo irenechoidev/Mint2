@@ -19,4 +19,4 @@ jobs:
 
       - name: Run backend tests
         run: mvn install test
-        working-directory: ./backend
+        working-directory: ./backend/Mint2
