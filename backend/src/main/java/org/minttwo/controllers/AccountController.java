@@ -20,7 +20,7 @@ public class AccountController implements AccountApi {
     }
 
     @Override
-    public void createAccount() {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void createAccount(Account account) {
+        accountClient.createAccount(account);
     }
 }
