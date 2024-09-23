@@ -22,12 +22,9 @@ public class UserController implements UserApi {
 
     @Override
     public void createUser(User user) {
-        String userId = UUID.randomUUID().toString();
         String password = user.getPassword();
         String hashedPassword = passwordEncoder.encode(password);
-
         user.setPassword(hashedPassword);
-        user.setId(userId);
 
         userClient.createUser(user);
     }

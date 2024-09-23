@@ -5,6 +5,8 @@ import org.minttwo.models.Account;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/account")
 public class AccountController implements AccountApi {
@@ -20,7 +22,7 @@ public class AccountController implements AccountApi {
     }
 
     @Override
-    public void createAccount() {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void createAccount(Account account) {
+        accountClient.createAccount(account);
     }
 }
