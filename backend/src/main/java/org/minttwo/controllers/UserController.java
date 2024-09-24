@@ -18,4 +18,9 @@ public class UserController implements UserApi {
     public void createUser(User user) {
         userClient.createUser(user);
     }
+
+    @Override
+    public User getUser(String id) {
+        return userClient.getUserById(id);
+    }
 }
