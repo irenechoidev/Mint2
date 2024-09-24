@@ -5,6 +5,8 @@ import org.minttwo.models.Account;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/account")
 public class AccountController implements AccountApi {
@@ -22,5 +24,10 @@ public class AccountController implements AccountApi {
     @Override
     public void createAccount(Account account) {
         accountClient.createAccount(account);
+    }
+
+    @Override
+    public List<Account> listAccounts(String userId) {
+        return accountClient.loadAccountsByUserId(userId);
     }
 }

@@ -1,7 +1,13 @@
 package org.minttwo.dataclients;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
+import java.util.Collections;
+import java.util.List;
 
 public abstract class DataClient<T> {
     private final Db db;
@@ -31,6 +37,28 @@ public abstract class DataClient<T> {
         try {
             transaction = session.beginTransaction();
             data = session.get(entityClass, id);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+        }
+
+        return data;
+    }
+
+    protected List<T> getByField(Class<T> entityClass, String fieldName, String fieldValue) {
+        Transaction transaction = null;
+        Session session = db.getCurrentSession();
+        List<T> data = Collections.emptyList();
+
+        try {
+            transaction = session.beginTransaction();
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<T> criteria =builder.createQuery(entityClass);
+            Root<T> root = criteria.from(entityClass);
+            criteria.select(root).where(builder.equal(root.get(fieldName), fieldValue));
+
+            data = session.createQuery(criteria).list();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
