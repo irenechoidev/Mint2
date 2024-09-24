@@ -15,8 +15,8 @@ public class AccountController implements AccountApi {
     }
 
     @Override
-    public Account getAccount() {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public Account getAccount(String id) {
+        return accountClient.getAccount(id);
     }
 
     @Override
