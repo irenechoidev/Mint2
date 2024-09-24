@@ -16,4 +16,8 @@ public class AccountClient extends DataClient<Account> {
 
         this.insert(account);
     }
+
+    public Account getAccount(String id) {
+        return this.getById(Account.class, id);
+    }
 }
