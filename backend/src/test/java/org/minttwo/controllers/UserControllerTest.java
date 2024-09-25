@@ -1,4 +1,4 @@
-package javatest.org.minttwo.controllers;
+package org.minttwo.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
