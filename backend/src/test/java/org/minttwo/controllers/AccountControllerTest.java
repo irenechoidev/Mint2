@@ -11,11 +11,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class AccountControllerTest {
+
+    private static final String TEST_ACCOUNT_ID = "TEST_ACCOUNT_ID";
 
     @Mock
     private AccountClient accountClient;
@@ -39,8 +43,21 @@ public class AccountControllerTest {
         assertThat(testAccount.getBalance()).isEqualTo(expectedAccount.getBalance());
     }
 
+    @Test
+    void getAccountSuccess() {
+        Account expectedAccount = buildAccount();
+        when(accountClient.getAccount(anyString())).thenReturn(expectedAccount);
+
+        Account testAccount = subject.getAccount(TEST_ACCOUNT_ID);
+
+        assertThat(testAccount.getId()).isEqualTo(expectedAccount.getId());
+        assertThat(testAccount.getBalance()).isEqualTo(expectedAccount.getBalance());
+        assertThat(testAccount.getUserId()).isEqualTo(expectedAccount.getUserId());
+    }
+
     private Account buildAccount() {
         return Account.builder()
+                .id(TEST_ACCOUNT_ID)
                 .userId("Test-UserId")
                 .balance(123.12)
                 .build();
