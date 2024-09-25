@@ -17,6 +17,10 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Install dependencies
+        run: mvn install
+        working-directory: ./backend
+
       - name: Run backend tests
-        run: mvn install test
+        run: mvn test
         working-directory: ./backend
