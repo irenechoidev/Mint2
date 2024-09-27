@@ -2,7 +2,6 @@ package org.minttwo.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.minttwo.controllers.UserController;
 import org.minttwo.dataclients.UserClient;
 import org.minttwo.models.User;
 import org.mockito.ArgumentCaptor;
@@ -12,11 +11,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
+
+    private static final String TEST_USER_ID = "TEST_USER_ID";
 
     @Mock
     private UserClient userClient;
@@ -38,6 +41,19 @@ public class UserControllerTest {
 
         assertThat(testUser.getEmail()).isEqualTo(expectedUser.getEmail());
         assertThat(testUser.getUsername()).isEqualTo(expectedUser.getUsername());
+    }
+
+    @Test
+    void getUserSuccess() {
+        User expectedUser = buildUser();
+        when(userClient.getUserById(anyString())).thenReturn(expectedUser);
+
+        User testUser = subject.getUser(TEST_USER_ID);
+
+        assertThat(testUser.getId()).isEqualTo(expectedUser.getId());
+        assertThat(testUser.getUsername()).isEqualTo(expectedUser.getUsername());
+        assertThat(testUser.getPassword()).isEqualTo(expectedUser.getPassword());
+        assertThat(testUser.getEmail()).isEqualTo(expectedUser.getEmail());
     }
 
     private User buildUser() {
