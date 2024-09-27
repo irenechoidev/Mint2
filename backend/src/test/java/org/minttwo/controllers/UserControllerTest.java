@@ -2,7 +2,6 @@ package org.minttwo.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.minttwo.controllers.UserController;
 import org.minttwo.dataclients.UserClient;
 import org.minttwo.models.User;
 import org.mockito.ArgumentCaptor;
