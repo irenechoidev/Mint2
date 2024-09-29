@@ -10,6 +10,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -19,7 +22,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class AccountControllerTest {
 
-    private static final String TEST_ACCOUNT_ID = "TEST_ACCOUNT_ID";
+    private static final String TEST_ACCOUNT_ID_PREFIX = "TEST_ACCOUNT_ID_";
+    private static final String TEST_USER_ID = "TEST_USER_ID";
 
     @Mock
     private AccountClient accountClient;
@@ -32,7 +36,8 @@ public class AccountControllerTest {
 
     @Test
     void createAccountSuccess() {
-        Account expectedAccount = buildAccount();
+        int accountNumber = 1;
+        Account expectedAccount = buildAccount(accountNumber);
 
         subject.createAccount(expectedAccount);
 
@@ -45,19 +50,40 @@ public class AccountControllerTest {
 
     @Test
     void getAccountSuccess() {
-        Account expectedAccount = buildAccount();
+        int accountNumber = 1;
+        String accountId = TEST_ACCOUNT_ID_PREFIX + accountNumber;
+        Account expectedAccount = buildAccount(accountNumber);
         when(accountClient.getAccount(anyString())).thenReturn(expectedAccount);
 
-        Account testAccount = subject.getAccount(TEST_ACCOUNT_ID);
+        Account testAccount = subject.getAccount(accountId);
 
         assertThat(testAccount.getId()).isEqualTo(expectedAccount.getId());
         assertThat(testAccount.getBalance()).isEqualTo(expectedAccount.getBalance());
         assertThat(testAccount.getUserId()).isEqualTo(expectedAccount.getUserId());
     }
 
-    private Account buildAccount() {
+    @Test
+    void listAccountsSuccess(){
+        int numAccounts = 10;
+        List<Account> expectedAccounts = new ArrayList<>();
+        for (int i = 0; i < numAccounts; i++) {
+            Account account = buildAccount(i);
+            expectedAccounts.add(account);
+        }
+
+       when(accountClient.loadAccountsByUserId(anyString())).thenReturn(expectedAccounts);
+
+        List<Account> testAccounts = subject.listAccounts(TEST_USER_ID);
+
+        assertThat(testAccounts.size()).isEqualTo(expectedAccounts.size());
+        assertThat(testAccounts).containsExactlyElementsOf(expectedAccounts);
+    }
+
+
+
+    private Account buildAccount(int index) {
         return Account.builder()
-                .id(TEST_ACCOUNT_ID)
+                .id(TEST_ACCOUNT_ID_PREFIX + index)
                 .userId("Test-UserId")
                 .balance(123.12)
                 .build();
