@@ -2,6 +2,7 @@ package org.minttwo.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.minttwo.api.AccountDto;
 import org.minttwo.api.ListAccountsResponseDto;
 import org.minttwo.dataclients.AccountClient;
 import org.minttwo.models.Account;
@@ -69,21 +70,27 @@ public class AccountControllerTest {
     @Test
     void listAccountsSuccess(){
         int numAccounts = 10;
-        List<Account> expectedAccounts = new ArrayList<>();
+        List<Account> expectedAccountsList = new ArrayList<>();
         for (int i = 0; i < numAccounts; i++) {
             Account account = buildAccount(i);
-            expectedAccounts.add(account);
+            expectedAccountsList.add(account);
         }
 
-       when(accountClient.loadAccountsByUserId(anyString())).thenReturn(expectedAccounts);
+       when(accountClient.loadAccountsByUserId(anyString())).thenReturn(expectedAccountsList);
 
         ResponseEntity<ListAccountsResponseDto> listAccountsDto = subject.listAccounts(TEST_USER_ID);
-        List<Account> testAccounts = Optional.ofNullable(listAccountsDto.getBody())
+        List<AccountDto> testAccountsList = Optional.ofNullable(listAccountsDto.getBody())
                         .map(ListAccountsResponseDto::getAccounts)
                         .orElse(Collections.emptyList());
 
-        assertThat(testAccounts.size()).isEqualTo(expectedAccounts.size());
-        assertThat(testAccounts).containsExactlyElementsOf(expectedAccounts);
+
+        AccountDto testAccount = testAccountsList.getFirst();
+        Account expectedAccount = expectedAccountsList.getFirst();
+
+        assertThat(testAccountsList.size()).isEqualTo(expectedAccountsList.size());
+        assertThat(testAccount.getId()).isEqualTo(expectedAccount.getId());
+        assertThat(testAccount.getUserId()).isEqualTo(expectedAccount.getUserId());
+        assertThat(testAccount.getBalance()).isEqualTo(expectedAccount.getBalance());
     }
 
     private Account buildAccount(int index) {

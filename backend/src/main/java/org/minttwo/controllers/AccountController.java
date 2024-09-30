@@ -1,6 +1,8 @@
 package org.minttwo.controllers;
 
+import org.minttwo.api.AccountDto;
 import org.minttwo.api.ListAccountsResponseDto;
+import org.minttwo.api.adapters.AccountAdapter;
 import org.minttwo.dataclients.AccountClient;
 import org.minttwo.models.Account;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +15,11 @@ import java.util.List;
 @RequestMapping("/account")
 public class AccountController implements AccountApi {
     private final AccountClient accountClient;
+    private final AccountAdapter accountAdapter;
 
     public AccountController(AccountClient accountClient) {
         this.accountClient = accountClient;
+        this.accountAdapter = new AccountAdapter();
     }
 
     @Override
@@ -31,9 +35,12 @@ public class AccountController implements AccountApi {
     @Override
     public ResponseEntity<ListAccountsResponseDto> listAccounts(String userId) {
         List<Account> accounts = accountClient.loadAccountsByUserId(userId);
+        List<AccountDto> accountDtos = accounts.stream()
+                .map(accountAdapter::adapt)
+                .toList();
 
         ListAccountsResponseDto listAccountsDto = ListAccountsResponseDto.builder()
-                .accounts(accounts)
+                .accounts(accountDtos)
                 .build();
 
         return ResponseEntity.ok(listAccountsDto);
