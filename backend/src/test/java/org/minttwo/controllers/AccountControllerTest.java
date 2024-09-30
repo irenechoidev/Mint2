@@ -2,6 +2,7 @@ package org.minttwo.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.minttwo.api.ListAccountsResponseDto;
 import org.minttwo.dataclients.AccountClient;
 import org.minttwo.models.Account;
 import org.mockito.ArgumentCaptor;
@@ -9,9 +10,12 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -73,13 +77,14 @@ public class AccountControllerTest {
 
        when(accountClient.loadAccountsByUserId(anyString())).thenReturn(expectedAccounts);
 
-        List<Account> testAccounts = subject.listAccounts(TEST_USER_ID);
+        ResponseEntity<ListAccountsResponseDto> listAccountsDto = subject.listAccounts(TEST_USER_ID);
+        List<Account> testAccounts = Optional.ofNullable(listAccountsDto.getBody())
+                        .map(ListAccountsResponseDto::getAccounts)
+                        .orElse(Collections.emptyList());
 
         assertThat(testAccounts.size()).isEqualTo(expectedAccounts.size());
         assertThat(testAccounts).containsExactlyElementsOf(expectedAccounts);
     }
-
-
 
     private Account buildAccount(int index) {
         return Account.builder()
