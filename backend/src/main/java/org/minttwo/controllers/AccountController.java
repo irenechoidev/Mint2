@@ -1,7 +1,9 @@
 package org.minttwo.controllers;
 
+import org.minttwo.api.ListAccountsResponseDto;
 import org.minttwo.dataclients.AccountClient;
 import org.minttwo.models.Account;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,7 +29,13 @@ public class AccountController implements AccountApi {
     }
 
     @Override
-    public List<Account> listAccounts(String userId) {
-        return accountClient.loadAccountsByUserId(userId);
+    public ResponseEntity<ListAccountsResponseDto> listAccounts(String userId) {
+        List<Account> accounts = accountClient.loadAccountsByUserId(userId);
+
+        ListAccountsResponseDto listAccountsDto = ListAccountsResponseDto.builder()
+                .accounts(accounts)
+                .build();
+
+        return ResponseEntity.ok(listAccountsDto);
     }
 }
