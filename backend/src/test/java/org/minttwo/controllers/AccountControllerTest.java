@@ -3,6 +3,7 @@ package org.minttwo.controllers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.minttwo.api.AccountDto;
+import org.minttwo.api.GetAccountResponseDto;
 import org.minttwo.api.ListAccountsResponseDto;
 import org.minttwo.dataclients.AccountClient;
 import org.minttwo.models.Account;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -60,8 +62,12 @@ public class AccountControllerTest {
         Account expectedAccount = buildAccount(accountNumber);
         when(accountClient.getAccount(anyString())).thenReturn(expectedAccount);
 
-        Account testAccount = subject.getAccount(accountId);
+        ResponseEntity<GetAccountResponseDto> response = subject.getAccount(accountId);
+        AccountDto testAccount = Optional.ofNullable(response.getBody())
+                        .map(GetAccountResponseDto::getAccount)
+                        .orElse(null);
 
+        assertNotNull(testAccount);
         assertThat(testAccount.getId()).isEqualTo(expectedAccount.getId());
         assertThat(testAccount.getBalance()).isEqualTo(expectedAccount.getBalance());
         assertThat(testAccount.getUserId()).isEqualTo(expectedAccount.getUserId());
@@ -78,8 +84,8 @@ public class AccountControllerTest {
 
        when(accountClient.loadAccountsByUserId(anyString())).thenReturn(expectedAccountsList);
 
-        ResponseEntity<ListAccountsResponseDto> listAccountsDto = subject.listAccounts(TEST_USER_ID);
-        List<AccountDto> testAccountsList = Optional.ofNullable(listAccountsDto.getBody())
+        ResponseEntity<ListAccountsResponseDto> response = subject.listAccounts(TEST_USER_ID);
+        List<AccountDto> testAccountsList = Optional.ofNullable(response.getBody())
                         .map(ListAccountsResponseDto::getAccounts)
                         .orElse(Collections.emptyList());
 
