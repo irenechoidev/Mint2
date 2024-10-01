@@ -36,8 +36,9 @@ public class AccountController implements AccountApi {
     }
 
     @Override
-    public void createAccount(Account account) {
+    public ResponseEntity<Void> createAccount(Account account) {
         accountClient.createAccount(account);
+        return ResponseEntity.ok().build();
     }
 
     @Override

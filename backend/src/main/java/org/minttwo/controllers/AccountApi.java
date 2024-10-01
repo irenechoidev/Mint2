@@ -14,7 +14,7 @@ public interface AccountApi {
     public ResponseEntity<GetAccountResponseDto> getAccount(@PathVariable String id);
 
     @PostMapping("/")
-    public void createAccount(@RequestBody Account account);
+    public ResponseEntity<Void> createAccount(@RequestBody Account account);
 
     @GetMapping("/list/{userId}")
     public ResponseEntity<ListAccountsResponseDto> listAccounts(@PathVariable String userId);
