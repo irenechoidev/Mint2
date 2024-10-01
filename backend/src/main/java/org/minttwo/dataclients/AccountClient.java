@@ -1,6 +1,7 @@
 package org.minttwo.dataclients;
 
 import lombok.NonNull;
+import org.minttwo.exception.NotFoundException;
 import org.minttwo.models.Account;
 
 import java.util.List;
@@ -21,7 +22,14 @@ public class AccountClient extends DataClient<Account> {
     }
 
     public Account getAccount(@NonNull String id) {
-        return this.getById(Account.class, id);
+        Account account = this.getById(Account.class, id);
+
+        if (account == null) {
+            String errMessage = String.format("Account with id %s not found", id);
+            throw new NotFoundException(errMessage, null);
+        }
+
+        return account;
     }
 
     public List<Account> loadAccountsByUserId(@NonNull String userId) {

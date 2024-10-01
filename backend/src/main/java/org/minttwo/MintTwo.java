@@ -7,6 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication(exclude = {HibernateJpaAutoConfiguration.class})
 @ComponentScan("org.minttwo.configurations")
+@ComponentScan("org.minttwo.exception")
 @ComponentScan("org.minttwo.controllers")
 public class MintTwo {
     public static void main(String[] args) {
