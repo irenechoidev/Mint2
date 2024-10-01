@@ -1,6 +1,7 @@
 package org.minttwo.controllers;
 
 import org.minttwo.api.AccountDto;
+import org.minttwo.api.GetAccountResponseDto;
 import org.minttwo.api.ListAccountsResponseDto;
 import org.minttwo.api.adapters.AccountAdapter;
 import org.minttwo.dataclients.AccountClient;
@@ -23,8 +24,15 @@ public class AccountController implements AccountApi {
     }
 
     @Override
-    public Account getAccount(String id) {
-        return accountClient.getAccount(id);
+    public ResponseEntity<GetAccountResponseDto> getAccount(String id) {
+        Account account = accountClient.getAccount(id);
+        AccountDto accountDto = accountAdapter.adapt(account);
+
+        GetAccountResponseDto getAccountDto = GetAccountResponseDto.builder()
+                .account(accountDto)
+                .build();
+
+        return ResponseEntity.ok(getAccountDto);
     }
 
     @Override
