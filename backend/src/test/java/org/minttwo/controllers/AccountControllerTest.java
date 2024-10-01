@@ -6,6 +6,7 @@ import org.minttwo.api.AccountDto;
 import org.minttwo.api.GetAccountResponseDto;
 import org.minttwo.api.ListAccountsResponseDto;
 import org.minttwo.dataclients.AccountClient;
+import org.minttwo.exception.NotFoundException;
 import org.minttwo.models.Account;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -71,6 +73,20 @@ public class AccountControllerTest {
         assertThat(testAccount.getId()).isEqualTo(expectedAccount.getId());
         assertThat(testAccount.getBalance()).isEqualTo(expectedAccount.getBalance());
         assertThat(testAccount.getUserId()).isEqualTo(expectedAccount.getUserId());
+    }
+
+    @Test
+    void whenCallingGetAccount_ResourceNotFound() {
+        int accountNumber = 1;
+        String accountId = TEST_ACCOUNT_ID_PREFIX + accountNumber;
+        String expectedErrMessage = String.format("Account with id %s not found", accountId);
+
+        when(accountClient.getAccount(anyString()))
+                .thenThrow(new NotFoundException(expectedErrMessage, null));
+
+        assertThatThrownBy(() -> subject.getAccount(accountId))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage(expectedErrMessage);
     }
 
     @Test
