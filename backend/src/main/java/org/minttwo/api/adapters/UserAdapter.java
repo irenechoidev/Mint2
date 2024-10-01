@@ -6,6 +6,7 @@ import org.minttwo.models.User;
 
 
 public class UserAdapter {
+    @NonNull
     public UserDto adapt(@NonNull User user){
         return UserDto.builder()
                 .id(user.getId())
