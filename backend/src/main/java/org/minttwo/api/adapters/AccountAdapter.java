@@ -5,6 +5,7 @@ import org.minttwo.api.AccountDto;
 import org.minttwo.models.Account;
 
 public class AccountAdapter {
+    @NonNull
     public AccountDto adapt(@NonNull Account account) {
         return AccountDto.builder()
                 .id(account.getId())

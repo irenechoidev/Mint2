@@ -2,6 +2,8 @@ package org.minttwo.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.minttwo.api.GetUserResponseDto;
+import org.minttwo.api.UserDto;
 import org.minttwo.dataclients.UserClient;
 import org.minttwo.models.User;
 import org.mockito.ArgumentCaptor;
@@ -9,8 +11,12 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -48,11 +54,14 @@ public class UserControllerTest {
         User expectedUser = buildUser();
         when(userClient.getUserById(anyString())).thenReturn(expectedUser);
 
-        User testUser = subject.getUser(TEST_USER_ID);
+        ResponseEntity<GetUserResponseDto> response = subject.getUser(TEST_USER_ID);
+        UserDto testUser = Optional.ofNullable(response.getBody())
+                .map(GetUserResponseDto::getUser)
+                .orElse(null);
 
+        assertNotNull(testUser);
         assertThat(testUser.getId()).isEqualTo(expectedUser.getId());
         assertThat(testUser.getUsername()).isEqualTo(expectedUser.getUsername());
-        assertThat(testUser.getPassword()).isEqualTo(expectedUser.getPassword());
         assertThat(testUser.getEmail()).isEqualTo(expectedUser.getEmail());
     }
 
