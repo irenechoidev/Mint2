@@ -1,6 +1,7 @@
 package org.minttwo.dataclients;
 
 import lombok.NonNull;
+import org.minttwo.exception.NotFoundException;
 import org.minttwo.models.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,12 @@ public class UserClient extends DataClient<User> {
     }
 
     public User getUserById(@NonNull String id) {
-        return this.getById(User.class, id);
+        User user = this.getById(User.class, id);
+
+        if (user == null) {
+            String errMessage = String.format("User with id %s not found", id);
+            throw new NotFoundException(errMessage, null);
+        }
+        return user;
     }
 }
