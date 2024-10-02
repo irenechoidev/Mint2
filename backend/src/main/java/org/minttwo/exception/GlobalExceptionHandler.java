@@ -8,10 +8,19 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    private static final int BAD_REQUEST_STATUS_CODE = 400;
     private static final int NOT_FOUND_STATUS_CODE = 404;
 
+    @ExceptionHandler({BadRequestException.class})
+    public ResponseEntity<ErrorDto> handleBadRequestException(@NonNull BadRequestException exception) {
+        ErrorDto errorDto = buildErrorDto(exception, BAD_REQUEST_STATUS_CODE);
+        return ResponseEntity
+                .status(BAD_REQUEST_STATUS_CODE)
+                .body(errorDto);
+    }
+
     @ExceptionHandler({NotFoundException.class})
-    public ResponseEntity<ErrorDto> handleUnsupportedOperation(@NonNull NotFoundException exception) {
+    public ResponseEntity<ErrorDto> handleNotFoundException(@NonNull NotFoundException exception) {
         ErrorDto errorDto = buildErrorDto(exception, NOT_FOUND_STATUS_CODE);
         return ResponseEntity
                 .status(NOT_FOUND_STATUS_CODE)

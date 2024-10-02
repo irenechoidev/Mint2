@@ -24,5 +24,5 @@ public class Account {
     private String userId;
 
     @Column(name = "balance")
-    private double balance;
+    private Double balance;
 }
