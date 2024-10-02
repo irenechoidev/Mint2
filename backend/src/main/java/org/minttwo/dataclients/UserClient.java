@@ -3,6 +3,7 @@ package org.minttwo.dataclients;
 import lombok.NonNull;
 import org.minttwo.exception.NotFoundException;
 import org.minttwo.models.User;
+import org.minttwo.validators.UserValidator;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -12,12 +13,17 @@ import java.util.UUID;
 public class UserClient extends DataClient<User> {
     private final PasswordEncoder passwordEncoder;
 
+    private final UserValidator validator;
+
     public UserClient(Db db) {
         super(db);
         this.passwordEncoder = new BCryptPasswordEncoder();
+        this.validator = new UserValidator();
     }
 
     public void createUser(@NonNull User user) {
+        validator.validate(user);
+
         String id = UUID.randomUUID().toString();
         String hashedPassword = passwordEncoder.encode(user.getPassword());
 
