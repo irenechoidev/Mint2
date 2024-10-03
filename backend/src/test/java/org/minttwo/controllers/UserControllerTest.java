@@ -26,9 +26,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
-
-    private static final String TEST_USER_ID = "TEST_USER_ID";
-    private static final String TEST_USER_ID_PREFIX = "TEST_USER_ID_PREFIX";
+    private static final String TEST_USER_ID_PREFIX = "TEST_USER_ID_";
 
     @Mock
     private UserClient userClient;
@@ -54,10 +52,13 @@ public class UserControllerTest {
 
     @Test
     void getUserSuccess() {
+        int userNumber = 1;
+        String userId = TEST_USER_ID_PREFIX + userNumber;
+
         User expectedUser = buildUser();
         when(userClient.getUserById(anyString())).thenReturn(expectedUser);
 
-        ResponseEntity<GetUserResponseDto> response = subject.getUser(TEST_USER_ID);
+        ResponseEntity<GetUserResponseDto> response = subject.getUser(userId);
         UserDto testUser = Optional.ofNullable(response.getBody())
                 .map(GetUserResponseDto::getUser)
                 .orElse(null);

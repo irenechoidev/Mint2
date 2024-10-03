@@ -26,11 +26,7 @@ public abstract class DataClient<T> {
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
-<<<<<<< Updated upstream
             throw e;
-=======
-            System.out.println(e.getMessage());
->>>>>>> Stashed changes
         }
     }
 
