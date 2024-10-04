@@ -5,6 +5,7 @@ import org.minttwo.exception.NotFoundException;
 import org.minttwo.models.Account;
 import org.minttwo.validators.AccountValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +23,8 @@ public class AccountClient extends DataClient<Account> {
         validator.validate(account);
 
         String id = UUID.randomUUID().toString();
+        account.setCreatedAt(LocalDateTime.now());
+        account.setUpdatedAt(LocalDateTime.now());
         account.setId(id);
 
         this.insert(account);
