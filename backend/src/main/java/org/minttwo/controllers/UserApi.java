@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public interface UserApi {
     @PostMapping("/")
-    public void createUser(@RequestBody User user);
+    public ResponseEntity<Void> createUser(@RequestBody User user);
 
     @GetMapping("/{id}")
     public ResponseEntity<GetUserResponseDto> getUser(@PathVariable String id);
