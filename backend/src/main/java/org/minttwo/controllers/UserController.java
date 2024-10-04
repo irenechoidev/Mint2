@@ -21,8 +21,9 @@ public class UserController implements UserApi {
     }
 
     @Override
-    public void createUser(User user) {
+    public ResponseEntity<Void> createUser(User user) {
         userClient.createUser(user);
+        return ResponseEntity.ok().build();
     }
 
     @Override
