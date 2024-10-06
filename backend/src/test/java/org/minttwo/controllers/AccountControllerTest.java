@@ -6,6 +6,7 @@ import org.minttwo.api.AccountDto;
 import org.minttwo.api.GetAccountResponseDto;
 import org.minttwo.api.ListAccountsResponseDto;
 import org.minttwo.dataclients.AccountClient;
+import org.minttwo.exception.BadRequestException;
 import org.minttwo.exception.NotFoundException;
 import org.minttwo.models.Account;
 import org.mockito.ArgumentCaptor;
@@ -23,7 +24,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,6 +58,22 @@ public class AccountControllerTest {
 
         assertThat(testAccount.getUserId()).isEqualTo(expectedAccount.getUserId());
         assertThat(testAccount.getBalance()).isEqualTo(expectedAccount.getBalance());
+    }
+
+    @Test
+    void whenCallingCreateAccount_BadRequest() {
+        int accountNumber = 1;
+        Account expectedAccount = buildAccount(accountNumber);
+        expectedAccount.setUserId("");
+
+        String expectedErrMessage = "UserId is required and cannot be blank";
+
+        doThrow(new BadRequestException(expectedErrMessage, null))
+                .when(accountClient).createAccount(any());
+
+        assertThatThrownBy(() -> subject.createAccount(expectedAccount))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(expectedErrMessage);
     }
 
     @Test
