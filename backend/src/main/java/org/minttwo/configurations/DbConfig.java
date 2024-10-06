@@ -1,6 +1,7 @@
 package org.minttwo.configurations;
 
 import org.hibernate.SessionFactory;
+import org.minttwo.dataclients.AccountTransactionClient;
 import org.minttwo.dataclients.Db;
 import org.minttwo.dataclients.AccountClient;
 import org.minttwo.dataclients.UserClient;
@@ -39,6 +40,11 @@ public class DbConfig {
     @Bean
     public UserClient userClient() {
         return new UserClient(db());
+    }
+
+    @Bean
+    public AccountTransactionClient accountTransactionClient() {
+        return new AccountTransactionClient(db());
     }
 
     @Bean
