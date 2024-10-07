@@ -11,8 +11,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class UserClient extends DataClient<User> {
-    private final PasswordEncoder passwordEncoder;
+    private static final String USERNAME_FIELD_NAME = "username";
 
+    private final PasswordEncoder passwordEncoder;
     private final UserValidator validator;
 
     public UserClient(Db db) {
@@ -43,5 +44,9 @@ public class UserClient extends DataClient<User> {
             throw new NotFoundException(errMessage, null);
         }
         return user;
+    }
+
+    public User getByUsername(@NonNull String username) {
+        return this.getByUniqueField(User.class, USERNAME_FIELD_NAME, username);
     }
 }

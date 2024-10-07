@@ -1,7 +1,7 @@
-package org.minttwo.api.adapters;
+package org.minttwo.api.user.adapters;
 
 import lombok.NonNull;
-import org.minttwo.api.UserDto;
+import org.minttwo.api.user.UserDto;
 import org.minttwo.models.User;
 
 

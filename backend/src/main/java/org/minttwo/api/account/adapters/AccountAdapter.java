@@ -1,7 +1,7 @@
-package org.minttwo.api.adapters;
+package org.minttwo.api.account.adapters;
 
 import lombok.NonNull;
-import org.minttwo.api.AccountDto;
+import org.minttwo.api.account.AccountDto;
 import org.minttwo.models.Account;
 
 public class AccountAdapter {

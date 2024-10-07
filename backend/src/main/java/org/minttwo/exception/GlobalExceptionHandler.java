@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     private static final int BAD_REQUEST_STATUS_CODE = 400;
+    private static final int ACCESS_DENIED_STATUS_CODE = 403;
     private static final int NOT_FOUND_STATUS_CODE = 404;
 
     @ExceptionHandler({BadRequestException.class})
@@ -16,6 +17,14 @@ public class GlobalExceptionHandler {
         ErrorDto errorDto = buildErrorDto(exception, BAD_REQUEST_STATUS_CODE);
         return ResponseEntity
                 .status(BAD_REQUEST_STATUS_CODE)
+                .body(errorDto);
+    }
+
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<ErrorDto> handleAccessDeniedException(@NonNull AccessDeniedException exception) {
+        ErrorDto errorDto = buildErrorDto(exception, ACCESS_DENIED_STATUS_CODE);
+        return ResponseEntity
+                .status(ACCESS_DENIED_STATUS_CODE)
                 .body(errorDto);
     }
 
