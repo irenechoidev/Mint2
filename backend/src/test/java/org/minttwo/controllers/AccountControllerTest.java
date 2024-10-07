@@ -2,9 +2,10 @@ package org.minttwo.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.minttwo.api.AccountDto;
-import org.minttwo.api.GetAccountResponseDto;
-import org.minttwo.api.ListAccountsResponseDto;
+import org.minttwo.api.account.AccountDto;
+import org.minttwo.api.account.GetAccountResponseDto;
+import org.minttwo.api.account.ListAccountsResponseDto;
+import org.minttwo.controllers.account.AccountController;
 import org.minttwo.dataclients.AccountClient;
 import org.minttwo.exception.BadRequestException;
 import org.minttwo.exception.NotFoundException;

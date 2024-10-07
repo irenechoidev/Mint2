@@ -1,4 +1,4 @@
-package org.minttwo.api;
+package org.minttwo.api.user;
 
 import lombok.Builder;
 import lombok.Data;

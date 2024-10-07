@@ -2,8 +2,9 @@ package org.minttwo.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.minttwo.api.GetUserResponseDto;
-import org.minttwo.api.UserDto;
+import org.minttwo.api.user.GetUserResponseDto;
+import org.minttwo.api.user.UserDto;
+import org.minttwo.controllers.user.UserController;
 import org.minttwo.dataclients.UserClient;
 import org.minttwo.exception.NotFoundException;
 import org.minttwo.models.User;

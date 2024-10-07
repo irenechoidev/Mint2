@@ -1,6 +1,7 @@
-package org.minttwo.controllers;
+package org.minttwo.controllers.user;
 
-import org.minttwo.api.GetUserResponseDto;
+import org.minttwo.api.user.GetUserResponseDto;
+import org.minttwo.api.user.LoginUserRequestDto;
 import org.minttwo.models.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,4 +15,9 @@ public interface UserApi {
 
     @GetMapping("/{id}")
     public ResponseEntity<GetUserResponseDto> getUser(@PathVariable String id);
+
+    @PostMapping("/login")
+    public ResponseEntity<Void> loginUser(
+            @RequestBody LoginUserRequestDto requestDto
+    );
 }

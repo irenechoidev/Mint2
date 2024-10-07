@@ -67,4 +67,26 @@ public abstract class DataClient<T> {
 
         return data;
     }
+
+    protected T getByUniqueField(Class<T> entityClass, String fieldName, String fieldValue) {
+        Transaction transaction = null;
+        Session session = db.getCurrentSession();
+        T result = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<T> criteria = builder.createQuery(entityClass);
+            Root<T> root = criteria.from(entityClass);
+            criteria.select(root).where(builder.equal(root.get(fieldName), fieldValue));
+
+            result = session.createQuery(criteria).uniqueResult();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+        }
+
+        return result;
+    }
 }

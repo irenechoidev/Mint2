@@ -1,8 +1,9 @@
-package org.minttwo.controllers;
+package org.minttwo.controllers.account;
 
-import org.minttwo.api.GetAccountResponseDto;
-import org.minttwo.api.ListAccountsResponseDto;
+import org.minttwo.api.account.GetAccountResponseDto;
+import org.minttwo.api.account.ListAccountsResponseDto;
 import org.minttwo.models.Account;
+import org.minttwo.models.AccountTransaction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,4 +19,9 @@ public interface AccountApi {
 
     @GetMapping("/list/{userId}")
     public ResponseEntity<ListAccountsResponseDto> listAccounts(@PathVariable String userId);
+
+    @PostMapping("/account_transaction")
+    public ResponseEntity<Void> createAccountTransaction(
+            @RequestBody AccountTransaction accountTransaction
+    );
 }
