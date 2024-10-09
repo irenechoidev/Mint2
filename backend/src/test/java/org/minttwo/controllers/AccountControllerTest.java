@@ -7,9 +7,11 @@ import org.minttwo.api.account.GetAccountResponseDto;
 import org.minttwo.api.account.ListAccountsResponseDto;
 import org.minttwo.controllers.account.AccountController;
 import org.minttwo.dataclients.AccountClient;
+import org.minttwo.dataclients.AccountTransactionClient;
 import org.minttwo.exception.BadRequestException;
 import org.minttwo.exception.NotFoundException;
 import org.minttwo.models.Account;
+import org.minttwo.models.AccountTransaction;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -36,16 +38,23 @@ import static org.mockito.Mockito.when;
 public class AccountControllerTest {
 
     private static final String TEST_ACCOUNT_ID_PREFIX = "TEST_ACCOUNT_ID_";
+    private static final String TEST_TRANSACTION_ID_PREFIX = "TEST_TRANSACTION_ID_";
     private static final String TEST_USER_ID = "TEST_USER_ID";
 
     @Mock
     private AccountClient accountClient;
+
+    @Mock
+    private AccountTransactionClient accountTransactionClient;
 
     @InjectMocks
     private AccountController subject;
 
     @Captor
     private ArgumentCaptor<Account> accountCaptor;
+
+    @Captor
+    private ArgumentCaptor<AccountTransaction> accountTransactionCaptor;
 
     @Test
     void createAccountSuccess() {
@@ -135,11 +144,50 @@ public class AccountControllerTest {
         assertThat(testAccount.getBalance()).isEqualTo(expectedAccount.getBalance());
     }
 
+    @Test
+    void createAccountTransactionSuccess() {
+        int accountNumber = 1;
+        AccountTransaction expectedAccountTransaction = buildAccountTransaction(accountNumber);
+
+        subject.createAccountTransaction(expectedAccountTransaction);
+
+        verify(accountTransactionClient, times(1))
+                .createAccountTransaction(accountTransactionCaptor.capture());
+
+        AccountTransaction testAccountTransaction = accountTransactionCaptor.getValue();
+        assertThat(testAccountTransaction.getAccountId()).isEqualTo(expectedAccountTransaction.getAccountId());
+        assertThat(testAccountTransaction.getAmount()).isEqualTo(expectedAccountTransaction.getAmount());
+    }
+
+    @Test
+    void whenCallingCreateAccountTransaction_BadRequest() {
+        int accountNumber = 1;
+        AccountTransaction expectedAccountTransaction = buildAccountTransaction(accountNumber);
+        expectedAccountTransaction.setAccountId("");
+
+        String expectedErrMessage = "AccountId is required and cannot be blank";
+
+        doThrow(new BadRequestException(expectedErrMessage, null))
+                .when(accountTransactionClient).createAccountTransaction(any());
+
+        assertThatThrownBy(() -> subject.createAccountTransaction(expectedAccountTransaction))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(expectedErrMessage);
+    }
+
     private Account buildAccount(int index) {
         return Account.builder()
                 .id(TEST_ACCOUNT_ID_PREFIX + index)
                 .userId("Test-UserId")
                 .balance(123.12)
+                .build();
+    }
+
+    private AccountTransaction buildAccountTransaction(int index) {
+        return AccountTransaction.builder()
+                .id(TEST_TRANSACTION_ID_PREFIX + index)
+                .accountId("Test-AccountId")
+                .amount(12.22)
                 .build();
     }
 }
