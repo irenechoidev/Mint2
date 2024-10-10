@@ -1,6 +1,7 @@
 package org.minttwo.dataclients;
 
 import lombok.NonNull;
+import org.minttwo.exception.NotFoundException;
 import org.minttwo.models.AccountTransaction;
 import org.minttwo.validators.AccountTransactionValidator;
 
@@ -24,5 +25,16 @@ public class AccountTransactionClient extends DataClient<AccountTransaction> {
         accountTransaction.setId(id);
 
         this.insert(accountTransaction);
+    }
+
+    public AccountTransaction getAccountTransaction(@NonNull String id) {
+        AccountTransaction accountTransaction = this.getById(AccountTransaction.class, id);
+
+        if (accountTransaction == null) {
+            String errMessage = String.format("AccountTransaction with id %s not found", id);
+            throw new NotFoundException(errMessage, null);
+        }
+
+        return accountTransaction;
     }
 }

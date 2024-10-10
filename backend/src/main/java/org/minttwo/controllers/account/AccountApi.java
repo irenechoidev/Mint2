@@ -1,6 +1,7 @@
 package org.minttwo.controllers.account;
 
 import org.minttwo.api.account.GetAccountResponseDto;
+import org.minttwo.api.account.GetAccountTransactionResponseDto;
 import org.minttwo.api.account.ListAccountsResponseDto;
 import org.minttwo.models.Account;
 import org.minttwo.models.AccountTransaction;
@@ -23,5 +24,10 @@ public interface AccountApi {
     @PostMapping("/account_transaction")
     public ResponseEntity<Void> createAccountTransaction(
             @RequestBody AccountTransaction accountTransaction
+    );
+
+    @GetMapping("/account_transaction/{id}")
+    public ResponseEntity<GetAccountTransactionResponseDto> getAccountTransaction(
+            @PathVariable String id
     );
 }
