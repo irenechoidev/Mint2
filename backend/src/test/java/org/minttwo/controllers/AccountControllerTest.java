@@ -3,7 +3,9 @@ package org.minttwo.controllers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.minttwo.api.account.AccountDto;
+import org.minttwo.api.account.AccountTransactionDto;
 import org.minttwo.api.account.GetAccountResponseDto;
+import org.minttwo.api.account.GetAccountTransactionResponseDto;
 import org.minttwo.api.account.ListAccountsResponseDto;
 import org.minttwo.controllers.account.AccountController;
 import org.minttwo.dataclients.AccountClient;
@@ -174,6 +176,39 @@ public class AccountControllerTest {
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(expectedErrMessage);
     }
+
+    @Test
+    void getAccountTransactionSuccess() {
+        int accountNumber = 1;
+        String accountId = TEST_TRANSACTION_ID_PREFIX + accountNumber;
+        AccountTransaction expectedAccountTransaction = buildAccountTransaction(accountNumber);
+        when(accountTransactionClient.getAccountTransaction(anyString())).thenReturn(expectedAccountTransaction);
+
+        ResponseEntity<GetAccountTransactionResponseDto> response = subject.getAccountTransaction(accountId);
+        AccountTransactionDto testAccountTransaction = Optional.ofNullable(response.getBody())
+                .map(GetAccountTransactionResponseDto::getAccountTransaction)
+                .orElse(null);
+
+        assertNotNull(testAccountTransaction);
+        assertThat(testAccountTransaction.getId()).isEqualTo(expectedAccountTransaction.getId());
+        assertThat(testAccountTransaction.getAccountId()).isEqualTo(expectedAccountTransaction.getAccountId());
+        assertThat(testAccountTransaction.getAmount()).isEqualTo(expectedAccountTransaction.getAmount());
+    }
+
+    @Test
+    void whenCallingGetAccountTransaction_ResourceNotFound() {
+        int accountNumber = 1;
+        String accountId = TEST_ACCOUNT_ID_PREFIX + accountNumber;
+        String expectedErrMessage = String.format("AccountTransaction with id %s not found", accountId);
+
+        when(accountTransactionClient.getAccountTransaction(anyString()))
+                .thenThrow(new NotFoundException(expectedErrMessage, null));
+
+        assertThatThrownBy(() -> subject.getAccountTransaction(accountId))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage(expectedErrMessage);
+    }
+
 
     private Account buildAccount(int index) {
         return Account.builder()
