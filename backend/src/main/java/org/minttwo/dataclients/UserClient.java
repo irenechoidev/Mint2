@@ -4,8 +4,6 @@ import lombok.NonNull;
 import org.minttwo.exception.NotFoundException;
 import org.minttwo.models.User;
 import org.minttwo.validators.UserValidator;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,12 +11,10 @@ import java.util.UUID;
 public class UserClient extends DataClient<User> {
     private static final String USERNAME_FIELD_NAME = "username";
 
-    private final PasswordEncoder passwordEncoder;
     private final UserValidator validator;
 
     public UserClient(Db db) {
         super(db);
-        this.passwordEncoder = new BCryptPasswordEncoder();
         this.validator = new UserValidator();
     }
 
@@ -26,11 +22,9 @@ public class UserClient extends DataClient<User> {
         validator.validate(user);
 
         String id = UUID.randomUUID().toString();
-        String hashedPassword = passwordEncoder.encode(user.getPassword());
 
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
-        user.setPassword(hashedPassword);
         user.setId(id);
 
         this.insert(user);
