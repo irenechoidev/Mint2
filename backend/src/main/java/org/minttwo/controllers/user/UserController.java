@@ -9,7 +9,6 @@ import org.minttwo.exception.AccessDeniedException;
 import org.minttwo.exception.NotFoundException;
 import org.minttwo.models.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,15 +20,22 @@ public class UserController implements UserApi {
     private final UserAdapter userAdapter;
     private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserClient userClient) {
+    public UserController(
+        UserClient userClient,
+        PasswordEncoder passwordEncoder
+    ) {
         this.userClient = userClient;
+        this.passwordEncoder = passwordEncoder;
         this.userAdapter = new UserAdapter();
-        passwordEncoder = new BCryptPasswordEncoder();
     }
 
     @Override
     public ResponseEntity<Void> createUser(User user) {
+        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(hashedPassword);
+
         userClient.createUser(user);
+
         return ResponseEntity.ok().build();
     }
 

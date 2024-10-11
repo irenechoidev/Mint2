@@ -3,9 +3,11 @@ package org.minttwo.controllers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.minttwo.api.user.GetUserResponseDto;
+import org.minttwo.api.user.LoginUserRequestDto;
 import org.minttwo.api.user.UserDto;
 import org.minttwo.controllers.user.UserController;
 import org.minttwo.dataclients.UserClient;
+import org.minttwo.exception.AccessDeniedException;
 import org.minttwo.exception.NotFoundException;
 import org.minttwo.models.User;
 import org.mockito.ArgumentCaptor;
@@ -13,7 +15,9 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -31,6 +35,9 @@ public class UserControllerTest {
 
     @Mock
     private UserClient userClient;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserController subject;
@@ -79,6 +86,65 @@ public class UserControllerTest {
                 .thenThrow(new NotFoundException(expectedErrMessage, null));
         assertThatThrownBy(() -> subject.getUser(userId))
                 .isInstanceOf(NotFoundException.class)
+                .hasMessage(expectedErrMessage);
+    }
+
+    @Test
+    void loginUserSuccess() {
+        int successStatusCode = 200;
+        HttpStatusCode expectedStatusCode = HttpStatusCode.valueOf(successStatusCode);
+        User expectedUser = buildUser();
+
+        LoginUserRequestDto requestDto = LoginUserRequestDto.builder()
+                .username(expectedUser.getUsername())
+                .password(expectedUser.getPassword())
+                .build();
+
+        when(userClient.getByUsername(anyString())).thenReturn(expectedUser);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        ResponseEntity<Void> response = subject.loginUser(requestDto);
+        assertThat(response.getStatusCode()).isEqualTo(expectedStatusCode);
+    }
+
+    @Test
+    void whenCallingUserLogin_ResourceNotFound() {
+        User expectedUser = buildUser();
+        LoginUserRequestDto requestDto = LoginUserRequestDto.builder()
+                .username(expectedUser.getUsername())
+                .password(expectedUser.getPassword())
+                .build();
+
+        String expectedErrMessage = String.format(
+                "User with username %s not found",
+                requestDto.getUsername()
+        );
+
+        when(userClient.getByUsername(anyString())).thenReturn(null);
+
+        assertThatThrownBy(() -> subject.loginUser(requestDto))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage(expectedErrMessage);
+    }
+
+    @Test
+    void whenCallingUserLogin_AccessDenied() {
+        User expectedUser = buildUser();
+        LoginUserRequestDto requestDto = LoginUserRequestDto.builder()
+                .username(expectedUser.getUsername())
+                .password(expectedUser.getPassword())
+                .build();
+
+        String expectedErrMessage = String.format(
+                "Password for user with username %s is incorrect",
+                requestDto.getUsername()
+        );
+
+        when(userClient.getByUsername(anyString())).thenReturn(expectedUser);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
+
+        assertThatThrownBy(() -> subject.loginUser(requestDto))
+                .isInstanceOf(AccessDeniedException.class)
                 .hasMessage(expectedErrMessage);
     }
 
