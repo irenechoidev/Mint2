@@ -222,6 +222,7 @@ public class AccountControllerTest {
         return AccountTransaction.builder()
                 .id(TEST_TRANSACTION_ID_PREFIX + index)
                 .accountId("Test-AccountId")
+                .title("Test-Title")
                 .amount(12.22)
                 .build();
     }

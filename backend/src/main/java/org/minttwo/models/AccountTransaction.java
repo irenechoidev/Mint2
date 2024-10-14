@@ -25,6 +25,9 @@ public class AccountTransaction {
     @Column(name = "account_id")
     private String accountId;
 
+    @Column(name = "title")
+    private String title;
+
     @Column(name = "amount")
     private Double amount;
 
