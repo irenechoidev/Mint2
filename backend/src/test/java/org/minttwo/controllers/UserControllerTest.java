@@ -8,6 +8,7 @@ import org.minttwo.api.user.UserDto;
 import org.minttwo.controllers.user.UserController;
 import org.minttwo.dataclients.UserClient;
 import org.minttwo.exception.AccessDeniedException;
+import org.minttwo.exception.BadRequestException;
 import org.minttwo.exception.NotFoundException;
 import org.minttwo.models.User;
 import org.mockito.ArgumentCaptor;
@@ -24,7 +25,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,6 +59,21 @@ public class UserControllerTest {
 
         assertThat(testUser.getEmail()).isEqualTo(expectedUser.getEmail());
         assertThat(testUser.getUsername()).isEqualTo(expectedUser.getUsername());
+    }
+
+    @Test
+    void whenCallingCreateUser_BadRequest() {
+        User expectedUser = buildUser();
+        expectedUser.setUsername("");
+
+        String expectedErrMessage = "Username is required and cannot be blank";
+
+        doThrow(new BadRequestException(expectedErrMessage, null))
+                .when(userClient).createUser(any());
+
+        assertThatThrownBy(() -> subject.createUser(expectedUser))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(expectedErrMessage);
     }
 
     @Test
