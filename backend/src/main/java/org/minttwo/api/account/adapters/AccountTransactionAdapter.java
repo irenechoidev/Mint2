@@ -10,6 +10,7 @@ public class AccountTransactionAdapter {
         return AccountTransactionDto.builder()
                 .id(accountTransaction.getId())
                 .accountId(accountTransaction.getAccountId())
+                .title(accountTransaction.getTitle())
                 .amount(accountTransaction.getAmount())
                 .build();
     }

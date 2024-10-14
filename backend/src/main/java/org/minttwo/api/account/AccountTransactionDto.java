@@ -8,5 +8,6 @@ import lombok.Data;
 public class AccountTransactionDto {
     private String id;
     private String accountId;
+    private String title;
     private double amount;
 }
