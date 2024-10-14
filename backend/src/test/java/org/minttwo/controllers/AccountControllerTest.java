@@ -192,6 +192,7 @@ public class AccountControllerTest {
         assertNotNull(testAccountTransaction);
         assertThat(testAccountTransaction.getId()).isEqualTo(expectedAccountTransaction.getId());
         assertThat(testAccountTransaction.getAccountId()).isEqualTo(expectedAccountTransaction.getAccountId());
+        assertThat(testAccountTransaction.getTitle()).isEqualTo(expectedAccountTransaction.getTitle());
         assertThat(testAccountTransaction.getAmount()).isEqualTo(expectedAccountTransaction.getAmount());
     }
 

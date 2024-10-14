@@ -9,6 +9,9 @@ public class AccountTransactionValidator {
         if (accountTransaction.getAccountId() == null || accountTransaction.getAccountId().isEmpty()) {
             throw new BadRequestException("AccountId is required and cannot be blank", null);
         }
+        if (accountTransaction.getTitle() == null || accountTransaction.getTitle().isEmpty()) {
+            throw new BadRequestException("Title is required and cannot be blank", null);
+        }
         if (accountTransaction.getAmount() == null) {
             throw new BadRequestException("Amount is required", null);
         }
