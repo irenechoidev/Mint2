@@ -2,13 +2,16 @@ package org.minttwo.dataclients;
 
 import lombok.NonNull;
 import org.minttwo.exception.NotFoundException;
+import org.minttwo.models.Account;
 import org.minttwo.models.AccountTransaction;
 import org.minttwo.validators.AccountTransactionValidator;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public class AccountTransactionClient extends DataClient<AccountTransaction> {
+    private static final String ACCOUNT_ID_FIELD_NAME = "accountId";
     private final AccountTransactionValidator validator;
 
     public AccountTransactionClient(Db db) {
@@ -36,5 +39,9 @@ public class AccountTransactionClient extends DataClient<AccountTransaction> {
         }
 
         return accountTransaction;
+    }
+
+    public List<AccountTransaction> loadAccountTransactionsByAccountId(@NonNull String accountId) {
+        return this.getByField(AccountTransaction.class, ACCOUNT_ID_FIELD_NAME, accountId);
     }
 }
