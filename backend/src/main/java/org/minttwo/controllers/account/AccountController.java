@@ -4,6 +4,7 @@ import org.minttwo.api.account.AccountDto;
 import org.minttwo.api.account.AccountTransactionDto;
 import org.minttwo.api.account.GetAccountResponseDto;
 import org.minttwo.api.account.GetAccountTransactionResponseDto;
+import org.minttwo.api.account.ListAccountTransactionsResponseDto;
 import org.minttwo.api.account.ListAccountsResponseDto;
 import org.minttwo.api.account.adapters.AccountAdapter;
 import org.minttwo.api.account.adapters.AccountTransactionAdapter;
@@ -68,7 +69,7 @@ public class AccountController implements AccountApi {
     }
 
     @Override
-    public ResponseEntity<Void> createAccountTransaction (AccountTransaction accountTransaction) {
+    public ResponseEntity<Void> createAccountTransaction(AccountTransaction accountTransaction) {
         accountTransactionClient.createAccountTransaction(accountTransaction);
         return ResponseEntity.ok().build();
     }
@@ -83,5 +84,21 @@ public class AccountController implements AccountApi {
                 .build();
 
         return ResponseEntity.ok(getAccountTransactionDto);
+    }
+
+    @Override
+    public ResponseEntity<ListAccountTransactionsResponseDto> listAccountTransactions(String accountId) {
+
+        List<AccountTransaction> accountTransactions = accountTransactionClient.loadAccountTransactionsByAccountId(accountId);
+        List<AccountTransactionDto> accountTransactionDto = accountTransactions.stream()
+                .map(accountTransactionAdapter::adapt)
+                .toList();
+
+        ListAccountTransactionsResponseDto listAccountTransactionsResponseDto = ListAccountTransactionsResponseDto
+                .builder()
+                .accountTransactionDtoList(accountTransactionDto)
+                .build();
+
+        return ResponseEntity.ok(listAccountTransactionsResponseDto);
     }
 }
