@@ -6,6 +6,7 @@ import org.minttwo.api.account.AccountDto;
 import org.minttwo.api.account.AccountTransactionDto;
 import org.minttwo.api.account.GetAccountResponseDto;
 import org.minttwo.api.account.GetAccountTransactionResponseDto;
+import org.minttwo.api.account.ListAccountTransactionsResponseDto;
 import org.minttwo.api.account.ListAccountsResponseDto;
 import org.minttwo.controllers.account.AccountController;
 import org.minttwo.dataclients.AccountClient;
@@ -42,6 +43,7 @@ public class AccountControllerTest {
     private static final String TEST_ACCOUNT_ID_PREFIX = "TEST_ACCOUNT_ID_";
     private static final String TEST_TRANSACTION_ID_PREFIX = "TEST_TRANSACTION_ID_";
     private static final String TEST_USER_ID = "TEST_USER_ID";
+    private static final String TEST_ACCOUNT_ID = "TEST_ACCOUNT_ID";
 
     @Mock
     private AccountClient accountClient;
@@ -208,6 +210,33 @@ public class AccountControllerTest {
         assertThatThrownBy(() -> subject.getAccountTransaction(accountId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage(expectedErrMessage);
+    }
+
+    @Test
+    void listAccountTransactionsSuccess() {
+        int numAccountTransactions = 10;
+        List<AccountTransaction> expectedAccountTransactionsList = new ArrayList<>();
+        for (int i = 0; i < numAccountTransactions; i++) {
+            AccountTransaction accountTransaction = buildAccountTransaction(i);
+            expectedAccountTransactionsList.add(accountTransaction);
+        }
+
+        when(accountTransactionClient.loadAccountTransactionsByAccountId(anyString()))
+                .thenReturn(expectedAccountTransactionsList);
+
+        ResponseEntity<ListAccountTransactionsResponseDto> response = subject.listAccountTransactions(TEST_ACCOUNT_ID);
+        List<AccountTransactionDto> testAccountTransactionsList = Optional.ofNullable(response.getBody())
+                .map(ListAccountTransactionsResponseDto::getAccountTransactionDtoList)
+                .orElse(Collections.emptyList());
+
+        AccountTransactionDto testAccountTransaction = testAccountTransactionsList.getFirst();
+        AccountTransaction expectedAccountTransaction = expectedAccountTransactionsList.getFirst();
+
+        assertThat(testAccountTransactionsList.size()).isEqualTo(expectedAccountTransactionsList.size());
+        assertThat(testAccountTransaction.getId()).isEqualTo(expectedAccountTransaction.getId());
+        assertThat(testAccountTransaction.getAccountId()).isEqualTo(expectedAccountTransaction.getAccountId());
+        assertThat(testAccountTransaction.getTitle()).isEqualTo(expectedAccountTransaction.getTitle());
+        assertThat(testAccountTransaction.getAmount()).isEqualTo(expectedAccountTransaction.getAmount());
     }
 
 
