@@ -1,10 +1,10 @@
 package org.minttwo.configurations;
 
 import org.hibernate.SessionFactory;
-import org.minttwo.dataclients.AccountTransactionClient;
-import org.minttwo.dataclients.Db;
-import org.minttwo.dataclients.AccountClient;
-import org.minttwo.dataclients.UserClient;
+import org.minttwo.data.dataclients.AccountTransactionClient;
+import org.minttwo.data.dataclients.Db;
+import org.minttwo.data.dataclients.AccountClient;
+import org.minttwo.data.dataclients.UserClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,0 +1,59 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.minttwo</groupId>
+    <artifactId>mint2-api</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.1</version>
+    </parent>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.openapitools</groupId>
+                    <artifactId>openapi-generator-maven-plugin</artifactId>
+                    <version>7.21.0</version>
+                    <configuration>
+                        <generatorName>spring</generatorName>
+                        <configOptions>
+                            <apiPackage>org.minttwo.generated.api</apiPackage>
+                            <modelPackage>org.minttwo.generated.api</modelPackage>
+                            <interfaceOnly>true</interfaceOnly>
+                            <useSpringBoot3>true</useSpringBoot3>
+                            <additionalModelTypeAnnotations>@lombok.Builder</additionalModelTypeAnnotations>
+                        </configOptions>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>account</id>
+                        <goals><goal>generate</goal></goals>
+                        <configuration>
+                            <inputSpec>${specDir}/account.yaml</inputSpec>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>user</id>
+                        <goals><goal>generate</goal></goals>
+                        <configuration>
+                            <inputSpec>${specDir}/user.yaml</inputSpec>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

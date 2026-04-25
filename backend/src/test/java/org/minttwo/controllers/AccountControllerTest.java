@@ -2,19 +2,14 @@ package org.minttwo.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.minttwo.api.account.AccountDto;
-import org.minttwo.api.account.AccountTransactionDto;
-import org.minttwo.api.account.GetAccountResponseDto;
-import org.minttwo.api.account.GetAccountTransactionResponseDto;
-import org.minttwo.api.account.ListAccountTransactionsResponseDto;
-import org.minttwo.api.account.ListAccountsResponseDto;
-import org.minttwo.controllers.account.AccountController;
-import org.minttwo.dataclients.AccountClient;
-import org.minttwo.dataclients.AccountTransactionClient;
-import org.minttwo.exception.BadRequestException;
-import org.minttwo.exception.NotFoundException;
-import org.minttwo.models.Account;
-import org.minttwo.models.AccountTransaction;
+import org.minttwo.generated.api.AccountDto;
+import org.minttwo.generated.api.GetAccountResponseDto;
+import org.minttwo.data.dataclients.AccountClient;
+import org.minttwo.data.dataclients.AccountTransactionClient;
+import org.minttwo.api.exception.BadRequestException;
+import org.minttwo.api.exception.NotFoundException;
+import org.minttwo.data.models.AccountModel;
+import org.minttwo.data.models.AccountTransaction;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -94,7 +89,7 @@ public class AccountControllerTest {
     void getAccountSuccess() {
         int accountNumber = 1;
         String accountId = TEST_ACCOUNT_ID_PREFIX + accountNumber;
-        Account expectedAccount = buildAccount(accountNumber);
+        AccountModel expectedAccount = buildAccount(accountNumber);
         when(accountClient.getAccount(anyString())).thenReturn(expectedAccount);
 
         ResponseEntity<GetAccountResponseDto> response = subject.getAccount(accountId);
@@ -240,8 +235,8 @@ public class AccountControllerTest {
     }
 
 
-    private Account buildAccount(int index) {
-        return Account.builder()
+    private AccountModel buildAccount(int index) {
+        return AccountModel.builder()
                 .id(TEST_ACCOUNT_ID_PREFIX + index)
                 .userId("Test-UserId")
                 .balance(123.12)
