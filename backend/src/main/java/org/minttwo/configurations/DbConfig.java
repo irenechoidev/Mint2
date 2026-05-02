@@ -63,7 +63,7 @@ public class DbConfig {
     public SessionFactory sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan(packagesToScan());
+        sessionFactory.setPackagesToScan(packagesToScan);
         sessionFactory.setHibernateProperties(hibernateProperties());
 
         try {
@@ -85,16 +85,10 @@ public class DbConfig {
         return dataSource;
     }
 
-    @Bean
-    public Properties hibernateProperties() {
-        Properties hibernateProperties = new Properties();
-        hibernateProperties.put("hibernate.show_sql", true);
-        return hibernateProperties;
-    }
-
-    @Bean
-    public String packagesToScan() {
-        return packagesToScan;
+    private Properties hibernateProperties() {
+        Properties properties = new Properties();
+        properties.put("hibernate.show_sql", true);
+        properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+        return properties;
     }
 }
-
