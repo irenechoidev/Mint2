@@ -1,0 +1,140 @@
+openapi: 3.0.3
+info:
+  title: Mint2 User API
+  version: 1.0.0
+
+paths:
+  /users/{id}:
+    get:
+      summary: Get a user by ID
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserResponseDto'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+  /users/login:
+    post:
+      summary: Login a user
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUserDto'
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+  /users:
+    post:
+      summary: Create a new user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+
+components:
+  schemas:
+    GetUserResponseDto:
+      type: object
+      required:
+        - user
+      properties:
+        user:
+          $ref: '#/components/schemas/UserDto'
+
+    LoginUserDto:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    CreateUserDto:
+      type: object
+      required:
+        - email
+        - username
+        - password
+      properties:
+        email:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+
+    UserDto:
+      type: object
+      required:
+        - id
+        - email
+        - username
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        username:
+          type: string

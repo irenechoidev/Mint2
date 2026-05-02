@@ -1,0 +1,258 @@
+openapi: 3.0.3
+info:
+  title: Mint2 Account API
+  version: 1.0.0
+
+paths:
+  /accounts/list/{userId}:
+    get:
+      operationId: listAccounts
+      summary: List accounts by user ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAccountsResponseDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+  /accounts/{id}:
+    get:
+      summary: Get an account by ID
+      operationId: getAccount
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAccountResponseDto'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+  /accounts:
+    post:
+      summary: Create a new account
+      operationId: createAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountDto'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+  /accounts/account_transaction/list/{accountId}:
+    get:
+      operationId: listAccountTransactions
+      summary: List transactions by account ID
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAccountTransactionsResponseDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+  /accounts/account_transaction/{id}:
+    get:
+      operationId: getAccountTransaction
+      summary: Get an account transaction by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAccountTransactionResponseDto'
+        '404':
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+  /accounts/account_transaction:
+    post:
+      summary: Create a new account transaction
+      operationId: createAccountTransaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountTransactionDto'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+
+components:
+  schemas:
+    GetAccountResponseDto:
+      type: object
+      required:
+        - account
+      properties:
+        account:
+          $ref: '#/components/schemas/AccountDto'
+
+    ListAccountsResponseDto:
+      type: object
+      required:
+        - accounts
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountDto'
+
+    GetAccountTransactionResponseDto:
+      type: object
+      required:
+        - account_transaction
+      properties:
+        account_transaction:
+          $ref: '#/components/schemas/AccountTransactionDto'
+
+    ListAccountTransactionsResponseDto:
+      type: object
+      required:
+        - account_transactions
+      properties:
+        account_transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountTransactionDto'
+
+    CreateAccountDto:
+      type: object
+      required:
+        - userId
+        - balance
+      properties:
+        userId:
+          type: string
+        balance:
+          type: number
+          format: double
+
+    CreateAccountTransactionDto:
+      type: object
+      required:
+        - accountId
+        - title
+        - amount
+      properties:
+        accountId:
+          type: string
+        title:
+          type: string
+        amount:
+          type: number
+          format: double
+
+    AccountDto:
+      type: object
+      required:
+        - id
+        - userId
+        - balance
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        balance:
+          type: number
+          format: double
+
+    AccountTransactionDto:
+      type: object
+      required:
+        - id
+        - accountId
+        - title
+        - amount
+      properties:
+        id:
+          type: string
+        accountId:
+          type: string
+        title:
+          type: string
+        amount:
+          type: number
+          format: double
