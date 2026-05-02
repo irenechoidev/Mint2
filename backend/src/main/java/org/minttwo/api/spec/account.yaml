@@ -21,6 +21,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListAccountsResponseDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
   /accounts/{id}:
     get:
       summary: Get an account by ID
@@ -38,6 +44,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetAccountResponseDto'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
   /accounts:
     post:
       summary: Create a new account
@@ -51,6 +69,18 @@ paths:
       responses:
         '201':
           description: Created
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
   /accounts/account_transaction/list/{accountId}:
     get:
       operationId: listAccountTransactions
@@ -68,6 +98,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListAccountTransactionsResponseDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
   /accounts/account_transaction/{id}:
     get:
       operationId: getAccountTransaction
@@ -85,6 +121,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetAccountTransactionResponseDto'
+        '404':
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
   /accounts/account_transaction:
     post:
       summary: Create a new account transaction
@@ -98,6 +146,18 @@ paths:
       responses:
         '201':
           description: Created
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
 
 components:
   schemas:

@@ -2,7 +2,7 @@ package org.minttwo.configurations;
 
 import org.hibernate.SessionFactory;
 import org.minttwo.data.dataclients.AccountTransactionClient;
-import org.minttwo.data.dataclients.Db;
+import org.minttwo.data.Db;
 import org.minttwo.data.dataclients.AccountClient;
 import org.minttwo.data.dataclients.UserClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -33,13 +35,18 @@ public class DbConfig {
     private String packagesToScan;
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public AccountClient accountClient() {
         return new AccountClient(db());
     }
 
     @Bean
     public UserClient userClient() {
-        return new UserClient(db());
+        return new UserClient(db(), passwordEncoder());
     }
 
     @Bean

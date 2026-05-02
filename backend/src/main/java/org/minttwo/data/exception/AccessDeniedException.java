@@ -1,4 +1,4 @@
-package org.minttwo.api.exception;
+package org.minttwo.data.exception;
 
 import jakarta.annotation.Nullable;
 import lombok.NonNull;

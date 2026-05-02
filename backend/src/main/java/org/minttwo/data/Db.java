@@ -1,4 +1,4 @@
-package org.minttwo.data.dataclients;
+package org.minttwo.data;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

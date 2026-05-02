@@ -19,7 +19,7 @@ public class AccountAdapter {
     }
 
     @NonNull
-    public AccountModel toAccountModel(@NonNull CreateAccountDto createAccountDto) {
+    public AccountModel toCreateAccountModel(@NonNull CreateAccountDto createAccountDto) {
         return AccountModel.builder()
                 .userId(createAccountDto.getUserId())
                 .balance(createAccountDto.getBalance())
@@ -38,7 +38,7 @@ public class AccountAdapter {
     }
 
     @NonNull
-    public AccountTransactionModel toAccountTransactionModel(
+    public AccountTransactionModel toCreateAccountTransactionModel(
             @NonNull CreateAccountTransactionDto createAccountTransactionDto) {
         return AccountTransactionModel.builder()
                 .accountId(createAccountTransactionDto.getAccountId())

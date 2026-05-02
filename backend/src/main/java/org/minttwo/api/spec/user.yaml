@@ -21,6 +21,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetUserResponseDto'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
   /users/login:
     post:
       summary: Login a user
@@ -34,6 +46,24 @@ paths:
       responses:
         '200':
           description: OK
+        '403':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
   /users:
     post:
       summary: Create a new user
@@ -47,6 +77,18 @@ paths:
       responses:
         '201':
           description: Created
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
+        default:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorDto'
 
 components:
   schemas:

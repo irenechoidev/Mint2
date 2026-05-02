@@ -1,4 +1,4 @@
-package org.minttwo.data.dataclients;
+package org.minttwo.data;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

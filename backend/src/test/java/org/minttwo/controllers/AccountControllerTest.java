@@ -2,14 +2,20 @@ package org.minttwo.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.minttwo.data.models.AccountTransactionModel;
 import org.minttwo.generated.api.AccountDto;
+import org.minttwo.generated.api.AccountTransactionDto;
+import org.minttwo.generated.api.CreateAccountDto;
+import org.minttwo.generated.api.CreateAccountTransactionDto;
 import org.minttwo.generated.api.GetAccountResponseDto;
 import org.minttwo.data.dataclients.AccountClient;
 import org.minttwo.data.dataclients.AccountTransactionClient;
-import org.minttwo.api.exception.BadRequestException;
-import org.minttwo.api.exception.NotFoundException;
+import org.minttwo.data.exception.InvalidInputException;
+import org.minttwo.data.exception.NotFoundException;
 import org.minttwo.data.models.AccountModel;
-import org.minttwo.data.models.AccountTransaction;
+import org.minttwo.generated.api.GetAccountTransactionResponseDto;
+import org.minttwo.generated.api.ListAccountTransactionsResponseDto;
+import org.minttwo.generated.api.ListAccountsResponseDto;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -17,7 +23,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -34,12 +39,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class AccountControllerTest {
-
-    private static final String TEST_ACCOUNT_ID_PREFIX = "TEST_ACCOUNT_ID_";
-    private static final String TEST_TRANSACTION_ID_PREFIX = "TEST_TRANSACTION_ID_";
-    private static final String TEST_USER_ID = "TEST_USER_ID";
-    private static final String TEST_ACCOUNT_ID = "TEST_ACCOUNT_ID";
-
     @Mock
     private AccountClient accountClient;
 
@@ -50,205 +49,202 @@ public class AccountControllerTest {
     private AccountController subject;
 
     @Captor
-    private ArgumentCaptor<Account> accountCaptor;
+    private ArgumentCaptor<AccountModel> accountModelCaptor;
 
     @Captor
-    private ArgumentCaptor<AccountTransaction> accountTransactionCaptor;
+    private ArgumentCaptor<AccountTransactionModel> accountTransactionModelCaptor;
 
     @Test
-    void createAccountSuccess() {
-        int accountNumber = 1;
-        Account expectedAccount = buildAccount(accountNumber);
+    void testCreateAccount_200() {
+        CreateAccountDto createAccountDto = CreateAccountDto.builder()
+                .balance(19.99)
+                .userId("this-is-user-id")
+                .build();
 
-        subject.createAccount(expectedAccount);
+        subject.createAccount(createAccountDto);
+        verify(accountClient, times(1))
+                .create(accountModelCaptor.capture());
 
-        verify(accountClient, times(1)).createAccount(accountCaptor.capture());
-        Account testAccount = accountCaptor.getValue();
-
-        assertThat(testAccount.getUserId()).isEqualTo(expectedAccount.getUserId());
-        assertThat(testAccount.getBalance()).isEqualTo(expectedAccount.getBalance());
+        AccountModel accountModel = accountModelCaptor.getValue();
+        assertThat(accountModel.getUserId()).isEqualTo("this-is-user-id");
+        assertThat(accountModel.getBalance()).isEqualTo(19.99);
     }
 
     @Test
-    void whenCallingCreateAccount_BadRequest() {
-        int accountNumber = 1;
-        Account expectedAccount = buildAccount(accountNumber);
-        expectedAccount.setUserId("");
+    void testCreateAccount_400() {
+        CreateAccountDto createAccountDto = CreateAccountDto.builder()
+                .balance(19.99)
+                .userId("this-is-user-id")
+                .build();
 
-        String expectedErrMessage = "UserId is required and cannot be blank";
+        doThrow(new InvalidInputException("UserId is required and cannot be blank", null))
+                .when(accountClient).create(any());
 
-        doThrow(new BadRequestException(expectedErrMessage, null))
-                .when(accountClient).createAccount(any());
-
-        assertThatThrownBy(() -> subject.createAccount(expectedAccount))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(expectedErrMessage);
+        assertThatThrownBy(() -> subject.createAccount(createAccountDto))
+                .isInstanceOf(InvalidInputException.class)
+                .hasMessage("UserId is required and cannot be blank");
     }
 
     @Test
-    void getAccountSuccess() {
-        int accountNumber = 1;
-        String accountId = TEST_ACCOUNT_ID_PREFIX + accountNumber;
-        AccountModel expectedAccount = buildAccount(accountNumber);
-        when(accountClient.getAccount(anyString())).thenReturn(expectedAccount);
+    void testGetAccount_200() {
+        when(accountClient.loadById(anyString())).thenReturn(AccountModel.builder()
+                        .id("account-id-789")
+                        .balance(233.20)
+                        .userId("i-am-user-999")
+                .build());
 
+        String accountId = "account-id-789";
         ResponseEntity<GetAccountResponseDto> response = subject.getAccount(accountId);
-        AccountDto testAccount = Optional.ofNullable(response.getBody())
+        AccountDto accountDto = Optional.ofNullable(response.getBody())
                         .map(GetAccountResponseDto::getAccount)
                         .orElse(null);
 
-        assertNotNull(testAccount);
-        assertThat(testAccount.getId()).isEqualTo(expectedAccount.getId());
-        assertThat(testAccount.getBalance()).isEqualTo(expectedAccount.getBalance());
-        assertThat(testAccount.getUserId()).isEqualTo(expectedAccount.getUserId());
+        assertNotNull(accountDto);
+        assertThat(accountDto.getId()).isEqualTo("account-id-789");
+        assertThat(accountDto.getBalance()).isEqualTo(233.20);
+        assertThat(accountDto.getUserId()).isEqualTo("i-am-user-999");
     }
 
     @Test
-    void whenCallingGetAccount_ResourceNotFound() {
-        int accountNumber = 1;
-        String accountId = TEST_ACCOUNT_ID_PREFIX + accountNumber;
-        String expectedErrMessage = String.format("Account with id %s not found", accountId);
+    void testGetAccount_404() {
+        when(accountClient.loadById(anyString()))
+                .thenThrow(new NotFoundException("Account with id account-id-789 not found", null));
 
-        when(accountClient.getAccount(anyString()))
-                .thenThrow(new NotFoundException(expectedErrMessage, null));
-
+        String accountId = "account-id-789";
         assertThatThrownBy(() -> subject.getAccount(accountId))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessage(expectedErrMessage);
+                .hasMessage(("Account with id account-id-789 not found"));
     }
 
     @Test
-    void listAccountsSuccess(){
-        int numAccounts = 10;
-        List<Account> expectedAccountsList = new ArrayList<>();
-        for (int i = 0; i < numAccounts; i++) {
-            Account account = buildAccount(i);
-            expectedAccountsList.add(account);
-        }
+    void testListAccount_200(){
+        when(accountClient.loadByUserId(anyString())).thenReturn(List.of(
+                AccountModel.builder()
+                        .id("account-id-123")
+                        .balance(2192.0)
+                        .userId("i-am-user-999")
+                        .build(),
+                AccountModel.builder()
+                        .id("account-id-345")
+                        .balance(300.1)
+                        .userId("i-am-user-999")
+                        .build()
+        ));
 
-       when(accountClient.loadAccountsByUserId(anyString())).thenReturn(expectedAccountsList);
-
-        ResponseEntity<ListAccountsResponseDto> response = subject.listAccounts(TEST_USER_ID);
-        List<AccountDto> testAccountsList = Optional.ofNullable(response.getBody())
+        String userId = "i-am-user-999";
+        ResponseEntity<ListAccountsResponseDto> response = subject.listAccounts(userId);
+        List<AccountDto> accountDtoList = Optional.ofNullable(response.getBody())
                         .map(ListAccountsResponseDto::getAccounts)
                         .orElse(Collections.emptyList());
+        AccountDto firstDto = accountDtoList.getFirst();
+        AccountDto secondDto = accountDtoList.getLast();
 
-
-        AccountDto testAccount = testAccountsList.getFirst();
-        Account expectedAccount = expectedAccountsList.getFirst();
-
-        assertThat(testAccountsList.size()).isEqualTo(expectedAccountsList.size());
-        assertThat(testAccount.getId()).isEqualTo(expectedAccount.getId());
-        assertThat(testAccount.getUserId()).isEqualTo(expectedAccount.getUserId());
-        assertThat(testAccount.getBalance()).isEqualTo(expectedAccount.getBalance());
+        assertThat(accountDtoList).hasSize(2);
+        assertThat(firstDto.getId()).isEqualTo("account-id-123");
+        assertThat(firstDto.getBalance()).isEqualTo(2192.0);
+        assertThat(firstDto.getUserId()).isEqualTo("i-am-user-999");
+        assertThat(secondDto.getId()).isEqualTo("account-id-345");
+        assertThat(secondDto.getBalance()).isEqualTo(300.1);
+        assertThat(secondDto.getUserId()).isEqualTo("i-am-user-999");
     }
 
     @Test
-    void createAccountTransactionSuccess() {
-        int accountNumber = 1;
-        AccountTransaction expectedAccountTransaction = buildAccountTransaction(accountNumber);
+    void testCreateAccountTransaction_200() {
+        CreateAccountTransactionDto createAccountTransactionDto = CreateAccountTransactionDto.builder()
+                .accountId("this-is-account-id")
+                .amount(11.29)
+                .build();
 
-        subject.createAccountTransaction(expectedAccountTransaction);
-
+        subject.createAccountTransaction(createAccountTransactionDto);
         verify(accountTransactionClient, times(1))
-                .createAccountTransaction(accountTransactionCaptor.capture());
+                .create(accountTransactionModelCaptor.capture());
 
-        AccountTransaction testAccountTransaction = accountTransactionCaptor.getValue();
-        assertThat(testAccountTransaction.getAccountId()).isEqualTo(expectedAccountTransaction.getAccountId());
-        assertThat(testAccountTransaction.getAmount()).isEqualTo(expectedAccountTransaction.getAmount());
+        AccountTransactionModel accountTransactionModel = accountTransactionModelCaptor.getValue();
+        assertThat(accountTransactionModel.getAccountId()).isEqualTo("this-is-account-id");
+        assertThat(accountTransactionModel.getAmount()).isEqualTo(11.29);
     }
 
     @Test
-    void whenCallingCreateAccountTransaction_BadRequest() {
-        int accountNumber = 1;
-        AccountTransaction expectedAccountTransaction = buildAccountTransaction(accountNumber);
-        expectedAccountTransaction.setAccountId("");
+    void testCreateAccountTransaction_400() {
+        CreateAccountTransactionDto createAccountTransactionDto = CreateAccountTransactionDto.builder()
+                .accountId("this-is-account-id")
+                .amount(11.29)
+                .build();
 
-        String expectedErrMessage = "AccountId is required and cannot be blank";
+        doThrow(new InvalidInputException("AccountId is required and cannot be blank", null))
+                .when(accountTransactionClient).create(any());
 
-        doThrow(new BadRequestException(expectedErrMessage, null))
-                .when(accountTransactionClient).createAccountTransaction(any());
-
-        assertThatThrownBy(() -> subject.createAccountTransaction(expectedAccountTransaction))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(expectedErrMessage);
+        assertThatThrownBy(() -> subject.createAccountTransaction(createAccountTransactionDto))
+                .isInstanceOf(InvalidInputException.class)
+                .hasMessage("AccountId is required and cannot be blank");
     }
 
     @Test
-    void getAccountTransactionSuccess() {
-        int accountNumber = 1;
-        String accountId = TEST_TRANSACTION_ID_PREFIX + accountNumber;
-        AccountTransaction expectedAccountTransaction = buildAccountTransaction(accountNumber);
-        when(accountTransactionClient.getAccountTransaction(anyString())).thenReturn(expectedAccountTransaction);
+    void testGetAccountTransaction_200() {
+        when(accountTransactionClient.loadById(anyString())).thenReturn(AccountTransactionModel.builder()
+                .id("transaction-id-ggg")
+                .accountId("account-id-324")
+                .title("Amazon Prime")
+                .amount(10.49)
+                .build());
 
-        ResponseEntity<GetAccountTransactionResponseDto> response = subject.getAccountTransaction(accountId);
-        AccountTransactionDto testAccountTransaction = Optional.ofNullable(response.getBody())
+        String transactionId = "transaction-id-ggg";
+        ResponseEntity<GetAccountTransactionResponseDto> response = subject.getAccountTransaction(transactionId);
+        AccountTransactionDto accountTransactionDto = Optional.ofNullable(response.getBody())
                 .map(GetAccountTransactionResponseDto::getAccountTransaction)
                 .orElse(null);
 
-        assertNotNull(testAccountTransaction);
-        assertThat(testAccountTransaction.getId()).isEqualTo(expectedAccountTransaction.getId());
-        assertThat(testAccountTransaction.getAccountId()).isEqualTo(expectedAccountTransaction.getAccountId());
-        assertThat(testAccountTransaction.getTitle()).isEqualTo(expectedAccountTransaction.getTitle());
-        assertThat(testAccountTransaction.getAmount()).isEqualTo(expectedAccountTransaction.getAmount());
+        assertNotNull(accountTransactionDto);
+        assertThat(accountTransactionDto.getId()).isEqualTo("transaction-id-ggg");
+        assertThat(accountTransactionDto.getAccountId()).isEqualTo("account-id-324");
+        assertThat(accountTransactionDto.getTitle()).isEqualTo("Amazon Prime");
+        assertThat(accountTransactionDto.getAmount()).isEqualTo(10.49);
     }
 
     @Test
-    void whenCallingGetAccountTransaction_ResourceNotFound() {
-        int accountNumber = 1;
-        String accountId = TEST_ACCOUNT_ID_PREFIX + accountNumber;
-        String expectedErrMessage = String.format("AccountTransaction with id %s not found", accountId);
+    void testGetAccountTransaction_404() {
+        when(accountTransactionClient.loadById(anyString()))
+                .thenThrow(new NotFoundException("AccountTransaction with id transaction-id-ggg not found", null));
 
-        when(accountTransactionClient.getAccountTransaction(anyString()))
-                .thenThrow(new NotFoundException(expectedErrMessage, null));
-
-        assertThatThrownBy(() -> subject.getAccountTransaction(accountId))
+        String transactionId = "transaction-id-ggg";
+        assertThatThrownBy(() -> subject.getAccountTransaction(transactionId))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessage(expectedErrMessage);
+                .hasMessage("AccountTransaction with id transaction-id-ggg not found");
     }
 
     @Test
-    void listAccountTransactionsSuccess() {
-        int numAccountTransactions = 10;
-        List<AccountTransaction> expectedAccountTransactionsList = new ArrayList<>();
-        for (int i = 0; i < numAccountTransactions; i++) {
-            AccountTransaction accountTransaction = buildAccountTransaction(i);
-            expectedAccountTransactionsList.add(accountTransaction);
-        }
+    void testListAccountTransactions_200() {
+        when(accountTransactionClient.loadByAccountId(anyString())).thenReturn(List.of(
+                AccountTransactionModel.builder()
+                        .id("transaction-id-223")
+                        .accountId("this-is-account-id")
+                        .title("Uber Eats")
+                        .amount(40.5)
+                        .build(),
+                AccountTransactionModel.builder()
+                        .id("transaction-id-999")
+                        .accountId("this-is-account-id")
+                        .title("Piano")
+                        .amount(5100.99)
+                        .build()
+        ));
 
-        when(accountTransactionClient.loadAccountTransactionsByAccountId(anyString()))
-                .thenReturn(expectedAccountTransactionsList);
-
-        ResponseEntity<ListAccountTransactionsResponseDto> response = subject.listAccountTransactions(TEST_ACCOUNT_ID);
-        List<AccountTransactionDto> testAccountTransactionsList = Optional.ofNullable(response.getBody())
-                .map(ListAccountTransactionsResponseDto::getAccountTransactionDtoList)
+        String accountId = "this-is-account-id";
+        ResponseEntity<ListAccountTransactionsResponseDto> response = subject.listAccountTransactions(accountId);
+        List<AccountTransactionDto> accountTransactionDtoList = Optional.ofNullable(response.getBody())
+                .map(ListAccountTransactionsResponseDto::getAccountTransactions)
                 .orElse(Collections.emptyList());
+        AccountTransactionDto firstDto = accountTransactionDtoList.getFirst();
+        AccountTransactionDto secondDto = accountTransactionDtoList.getLast();
 
-        AccountTransactionDto testAccountTransaction = testAccountTransactionsList.getFirst();
-        AccountTransaction expectedAccountTransaction = expectedAccountTransactionsList.getFirst();
-
-        assertThat(testAccountTransactionsList.size()).isEqualTo(expectedAccountTransactionsList.size());
-        assertThat(testAccountTransaction.getId()).isEqualTo(expectedAccountTransaction.getId());
-        assertThat(testAccountTransaction.getAccountId()).isEqualTo(expectedAccountTransaction.getAccountId());
-        assertThat(testAccountTransaction.getTitle()).isEqualTo(expectedAccountTransaction.getTitle());
-        assertThat(testAccountTransaction.getAmount()).isEqualTo(expectedAccountTransaction.getAmount());
-    }
-
-
-    private AccountModel buildAccount(int index) {
-        return AccountModel.builder()
-                .id(TEST_ACCOUNT_ID_PREFIX + index)
-                .userId("Test-UserId")
-                .balance(123.12)
-                .build();
-    }
-
-    private AccountTransaction buildAccountTransaction(int index) {
-        return AccountTransaction.builder()
-                .id(TEST_TRANSACTION_ID_PREFIX + index)
-                .accountId("Test-AccountId")
-                .title("Test-Title")
-                .amount(12.22)
-                .build();
+        assertThat(accountTransactionDtoList).hasSize(2);
+        assertThat(firstDto.getId()).isEqualTo("transaction-id-223");
+        assertThat(firstDto.getAccountId()).isEqualTo("this-is-account-id");
+        assertThat(firstDto.getTitle()).isEqualTo("Uber Eats");
+        assertThat(firstDto.getAmount()).isEqualTo(40.5);
+        assertThat(secondDto.getId()).isEqualTo("transaction-id-999");
+        assertThat(secondDto.getAccountId()).isEqualTo("this-is-account-id");
+        assertThat(secondDto.getTitle()).isEqualTo("Piano");
+        assertThat(secondDto.getAmount()).isEqualTo(5100.99);
     }
 }

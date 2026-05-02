@@ -1,7 +1,9 @@
 package org.minttwo.data.dataclients;
 
 import lombok.NonNull;
-import org.minttwo.api.exception.NotFoundException;
+import org.minttwo.data.DataClient;
+import org.minttwo.data.Db;
+import org.minttwo.data.exception.NotFoundException;
 import org.minttwo.data.models.AccountModel;
 import org.minttwo.data.validators.AccountValidator;
 

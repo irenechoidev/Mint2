@@ -2,8 +2,6 @@ package org.minttwo.controllers;
 
 import org.minttwo.controllers.adapters.UserAdapter;
 import org.minttwo.data.dataclients.UserClient;
-import org.minttwo.api.exception.AccessDeniedException;
-import org.minttwo.api.exception.NotFoundException;
 import org.minttwo.data.models.UserModel;
 import org.minttwo.generated.api.CreateUserDto;
 import org.minttwo.generated.api.GetUserResponseDto;
@@ -11,7 +9,6 @@ import org.minttwo.generated.api.LoginUserDto;
 import org.minttwo.generated.api.UserDto;
 import org.minttwo.generated.api.UsersApi;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,14 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController implements UsersApi {
     private final UserClient userClient;
     private final UserAdapter userAdapter;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserController(
-        UserClient userClient,
-        PasswordEncoder passwordEncoder
-    ) {
+    public UserController(UserClient userClient) {
         this.userClient = userClient;
-        this.passwordEncoder = passwordEncoder;
         this.userAdapter = new UserAdapter();
     }
 
@@ -43,27 +35,15 @@ public class UserController implements UsersApi {
     }
 
     @Override
-    public ResponseEntity<Void> loginUser(LoginUserDto requestDto) {
-        UserModel userModel = userClient.getByUsername(requestDto.getUsername());
-        if (userModel == null) {
-            String errMessage = "User with username %s not found";
-            throw new NotFoundException(String.format(errMessage, requestDto.getUsername()), null);
-        }
-
-        if (!passwordEncoder.matches(requestDto.getPassword(), userModel.getPassword())) {
-            String errMessage = "Password for user with username %s is incorrect";
-            throw new AccessDeniedException(String.format(errMessage, requestDto.getUsername()), null);
-        }
-
+    public ResponseEntity<Void> loginUser(LoginUserDto loginUserDto) {
+        UserModel userModel = userAdapter.toLoginUserModel(loginUserDto);
+        userClient.loginUser(userModel);
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<Void> createUser(CreateUserDto createUserDto) {
-        String hashedPassword = passwordEncoder.encode(createUserDto.getPassword());
-        createUserDto.setPassword(hashedPassword);
-        UserModel userModel = userAdapter.toUserModel(createUserDto);
-
+        UserModel userModel = userAdapter.toCreateUserModel(createUserDto);
         userClient.createUser(userModel);
         return ResponseEntity.ok().build();
     }

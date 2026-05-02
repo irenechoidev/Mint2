@@ -64,7 +64,7 @@ public class AccountController implements AccountsApi {
 
     @Override
     public ResponseEntity<Void> createAccount(CreateAccountDto createAccountDto) {
-        AccountModel accountModel = accountAdapter.toAccountModel(createAccountDto);
+        AccountModel accountModel = accountAdapter.toCreateAccountModel(createAccountDto);
         accountClient.create(accountModel);
         return ResponseEntity.ok().build();
     }
@@ -101,7 +101,7 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<Void> createAccountTransaction(
             CreateAccountTransactionDto createAccountTransactionDto) {
         AccountTransactionModel accountTransactionModel =
-                accountAdapter.toAccountTransactionModel(createAccountTransactionDto);
+                accountAdapter.toCreateAccountTransactionModel(createAccountTransactionDto);
         accountTransactionClient.create(accountTransactionModel);
         return ResponseEntity.ok().build();
     }
