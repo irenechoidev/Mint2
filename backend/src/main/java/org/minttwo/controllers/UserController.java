@@ -9,11 +9,9 @@ import org.minttwo.generated.api.LoginUserDto;
 import org.minttwo.generated.api.UserDto;
 import org.minttwo.generated.api.UsersApi;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user")
 public class UserController implements UsersApi {
     private final UserClient userClient;
     private final UserAdapter userAdapter;

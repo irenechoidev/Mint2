@@ -15,13 +15,11 @@ import org.minttwo.generated.api.GetAccountTransactionResponseDto;
 import org.minttwo.generated.api.ListAccountTransactionsResponseDto;
 import org.minttwo.generated.api.ListAccountsResponseDto;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/account")
 public class AccountController implements AccountsApi {
     private final AccountClient accountClient;
     private final AccountTransactionClient accountTransactionClient;
