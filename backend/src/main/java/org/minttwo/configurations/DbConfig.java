@@ -89,10 +89,6 @@ public class DbConfig {
         Properties properties = new Properties();
         properties.put("hibernate.show_sql", true);
         properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-        properties.put("jakarta.persistence.jdbc.url", dbUrl);
-        properties.put("jakarta.persistence.jdbc.user", dbUsername);
-        properties.put("jakarta.persistence.jdbc.password", dbPassword);
-        properties.put("jakarta.persistence.jdbc.driver", dbDriver);
         return properties;
     }
 }
