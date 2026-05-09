@@ -19,7 +19,7 @@ public class UserClient extends DataClient<UserModel> {
     private final PasswordEncoder passwordEncoder;
 
     public UserClient(Db db, PasswordEncoder passwordEncoder) {
-        super(db);
+        super(db, UserModel.class);
         this.validator = new UserValidator();
         this.passwordEncoder = passwordEncoder;
     }
@@ -38,7 +38,7 @@ public class UserClient extends DataClient<UserModel> {
     }
 
     public UserModel loadById(@NonNull String id) {
-        UserModel userModel = this.getById(UserModel.class, id);
+        UserModel userModel = this.getById(id);
 
         if (userModel == null) {
             String errMessage = String.format("User with id %s not found", id);
@@ -49,11 +49,8 @@ public class UserClient extends DataClient<UserModel> {
     }
 
     public void loginUser(@NonNull UserModel requestUser) {
-        UserModel userModel =  this.getByUniqueField(
-                UserModel.class,
-                USERNAME_FIELD_NAME,
-                requestUser.getUsername()
-        );
+        UserModel userModel =
+                this.getByUniqueField(USERNAME_FIELD_NAME, requestUser.getUsername());
 
         if (userModel == null) {
             String errMessage = "User with username %s not found";

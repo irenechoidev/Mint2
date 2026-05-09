@@ -17,7 +17,7 @@ public class AccountClient extends DataClient<AccountModel> {
     private final AccountValidator validator;
 
     public AccountClient(Db db) {
-        super(db);
+        super(db, AccountModel.class);
         this.validator = new AccountValidator();
     }
 
@@ -33,7 +33,7 @@ public class AccountClient extends DataClient<AccountModel> {
     }
 
     public AccountModel loadById(@NonNull String id) {
-        AccountModel accountModel = this.getById(AccountModel.class, id);
+        AccountModel accountModel = this.getById(id);
 
         if (accountModel == null) {
             String errMessage = String.format("Account with id %s not found", id);
@@ -44,6 +44,6 @@ public class AccountClient extends DataClient<AccountModel> {
     }
 
     public List<AccountModel> loadByUserId(@NonNull String userId) {
-        return this.getByField(AccountModel.class, USER_ID_FIELD_NAME, userId);
+        return this.getByField(USER_ID_FIELD_NAME, userId);
     }
 }
