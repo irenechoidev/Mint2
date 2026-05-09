@@ -32,6 +32,20 @@ public abstract class DataClient<T> {
         }
     }
 
+    protected void update(T data) {
+        Transaction transaction = null;
+        Session session = db.getCurrentSession();
+
+        try {
+            transaction = session.beginTransaction();
+            session.merge(data);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            throw e;
+        }
+    }
+
     protected T getById(String id) {
         Transaction transaction = null;
         Session session = db.getCurrentSession();
