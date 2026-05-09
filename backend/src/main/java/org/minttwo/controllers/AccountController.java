@@ -1,6 +1,7 @@
 package org.minttwo.controllers;
 
 import org.minttwo.controllers.adapters.AccountAdapter;
+import org.minttwo.data.Db;
 import org.minttwo.data.dataclients.AccountClient;
 import org.minttwo.data.dataclients.AccountTransactionClient;
 import org.minttwo.data.models.AccountModel;
@@ -24,14 +25,17 @@ public class AccountController implements AccountsApi {
     private final AccountClient accountClient;
     private final AccountTransactionClient accountTransactionClient;
     private final AccountAdapter accountAdapter;
+    private final Db db;
 
     public AccountController(
             AccountClient accountClient,
-            AccountTransactionClient accountTransactionClient
+            AccountTransactionClient accountTransactionClient,
+            Db db
     ) {
         this.accountClient = accountClient;
         this.accountTransactionClient = accountTransactionClient;
         this.accountAdapter = new AccountAdapter();
+        this.db = db;
     }
 
     @Override
@@ -98,7 +102,14 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> createAccountTransaction(
             CreateAccountTransactionDto createAccountTransactionDto) {
-        accountClient.loadById(createAccountTransactionDto.getAccountId());
+        String accountId = createAccountTransactionDto.getAccountId();
+        AccountModel accountModel = accountClient.loadById(accountId);
+        accountClient.update(
+                accountModel.toBuilder()
+                        .balance(accountModel.getBalance() - createAccountTransactionDto.getAmount())
+                        .build()
+        );
+
         AccountTransactionModel accountTransactionModel =
                 accountAdapter.toCreateAccountTransactionModel(createAccountTransactionDto);
         accountTransactionClient.create(accountTransactionModel);
