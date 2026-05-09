@@ -31,6 +31,10 @@ public class AccountClient extends DataClient<AccountModel> {
         this.insert(accountModel);
     }
 
+    public void update(@NonNull AccountModel accountModel) {
+        super.update(accountModel);
+    }
+
     public AccountModel loadById(@NonNull String id) {
         AccountModel accountModel = this.getById(id);
 

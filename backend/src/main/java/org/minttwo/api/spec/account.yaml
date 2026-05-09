@@ -152,6 +152,12 @@ paths:
             application/json:
               schema:
                 $ref: './common.yaml#/components/schemas/ErrorDto'
+        '404':
+            description: Account not found
+            content:
+              application/json:
+                schema:
+                  $ref: './common.yaml#/components/schemas/ErrorDto'
         default:
           description: Internal server error
           content:
