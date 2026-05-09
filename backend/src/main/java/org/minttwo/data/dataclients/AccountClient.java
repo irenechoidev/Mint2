@@ -25,6 +25,7 @@ public class AccountClient extends DataClient<AccountModel> {
         String id = UUID.randomUUID().toString();
         accountModel.setCreatedAt(LocalDateTime.now());
         accountModel.setUpdatedAt(LocalDateTime.now());
+        accountModel.setBalance(0.0);
         accountModel.setId(id);
 
         this.insert(accountModel);
