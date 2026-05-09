@@ -151,12 +151,21 @@ public class AccountControllerTest {
                 .accountId("this-is-account-id")
                 .amount(11.29)
                 .build();
+        when(accountClient.loadById(anyString())).thenReturn(AccountModel.builder()
+                .id("account-id-789")
+                .balance(233.20)
+                .userId("i-am-user-999")
+                .build());
 
         subject.createAccountTransaction(createAccountTransactionDto);
         verify(accountTransactionClient, times(1))
                 .create(accountTransactionModelCaptor.capture());
+        verify(accountClient, times(1))
+                .update(accountModelCaptor.capture());
 
         AccountTransactionModel accountTransactionModel = accountTransactionModelCaptor.getValue();
+        AccountModel accountModel = accountModelCaptor.getValue();
+        assertThat(accountModel.getBalance()).isEqualTo(221.91);
         assertThat(accountTransactionModel.getAccountId()).isEqualTo("this-is-account-id");
         assertThat(accountTransactionModel.getAmount()).isEqualTo(11.29);
     }
@@ -167,6 +176,11 @@ public class AccountControllerTest {
                 .accountId("this-is-account-id")
                 .amount(11.29)
                 .build();
+        when(accountClient.loadById(anyString())).thenReturn(AccountModel.builder()
+                .id("account-id-789")
+                .balance(233.20)
+                .userId("i-am-user-999")
+                .build());
 
         doThrow(new InvalidInputException("AccountId is required and cannot be blank", null))
                 .when(accountTransactionClient).create(any());
@@ -174,6 +188,20 @@ public class AccountControllerTest {
         assertThatThrownBy(() -> subject.createAccountTransaction(createAccountTransactionDto))
                 .isInstanceOf(InvalidInputException.class)
                 .hasMessage("AccountId is required and cannot be blank");
+    }
+
+    @Test
+    void testCreateAccountTransaction_404() {
+        CreateAccountTransactionDto createAccountTransactionDto = CreateAccountTransactionDto.builder()
+                .accountId("this-is-account-id")
+                .amount(11.29)
+                .build();
+        when(accountClient.loadById(anyString()))
+                .thenThrow(new NotFoundException("Account with id account-id-789 not found", null));
+
+        assertThatThrownBy(() -> subject.createAccountTransaction(createAccountTransactionDto))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage(("Account with id account-id-789 not found"));
     }
 
     @Test
