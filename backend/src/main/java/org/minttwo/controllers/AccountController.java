@@ -98,7 +98,15 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> createAccountTransaction(
             CreateAccountTransactionDto createAccountTransactionDto) {
-        accountClient.loadById(createAccountTransactionDto.getAccountId());
+        AccountModel accountModel = accountClient.loadById(
+                createAccountTransactionDto.getAccountId()
+        );
+        accountClient.update(
+                accountModel.toBuilder()
+                        .balance(accountModel.getBalance() - createAccountTransactionDto.getAmount())
+                        .build()
+        );
+
         AccountTransactionModel accountTransactionModel =
                 accountAdapter.toCreateAccountTransactionModel(createAccountTransactionDto);
         accountTransactionClient.create(accountTransactionModel);
