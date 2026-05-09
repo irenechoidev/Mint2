@@ -201,13 +201,9 @@ components:
       type: object
       required:
         - userId
-        - balance
       properties:
         userId:
           type: string
-        balance:
-          type: number
-          format: double
 
     CreateAccountTransactionDto:
       type: object

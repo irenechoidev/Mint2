@@ -9,9 +9,5 @@ public class AccountValidator {
         if (account.getUserId() == null || account.getUserId().isEmpty()) {
             throw new InvalidInputException("UserId is required and cannot be blank", null);
         }
-
-        if (account.getBalance() == null) {
-            throw new InvalidInputException("Balance is required", null);
-        }
     }
 }

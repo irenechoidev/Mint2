@@ -57,7 +57,6 @@ public class AccountControllerTest {
     @Test
     void testCreateAccount_200() {
         CreateAccountDto createAccountDto = CreateAccountDto.builder()
-                .balance(19.99)
                 .userId("this-is-user-id")
                 .build();
 
@@ -67,13 +66,11 @@ public class AccountControllerTest {
 
         AccountModel accountModel = accountModelCaptor.getValue();
         assertThat(accountModel.getUserId()).isEqualTo("this-is-user-id");
-        assertThat(accountModel.getBalance()).isEqualTo(19.99);
     }
 
     @Test
     void testCreateAccount_400() {
         CreateAccountDto createAccountDto = CreateAccountDto.builder()
-                .balance(19.99)
                 .userId("this-is-user-id")
                 .build();
 
