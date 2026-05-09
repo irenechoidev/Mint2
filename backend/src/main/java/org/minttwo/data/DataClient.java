@@ -11,9 +11,11 @@ import java.util.List;
 
 public abstract class DataClient<T> {
     private final Db db;
+    private final Class<T> entityClass;
 
-    public DataClient(Db db) {
+    public DataClient(Db db, Class<T> entityClass) {
         this.db = db;
+        this.entityClass = entityClass;
     }
 
     protected void insert(T data) {
@@ -30,7 +32,7 @@ public abstract class DataClient<T> {
         }
     }
 
-    protected T getById(Class<T> entityClass, String id) {
+    protected T getById(String id) {
         Transaction transaction = null;
         Session session = db.getCurrentSession();
         T data = null;
@@ -46,7 +48,7 @@ public abstract class DataClient<T> {
         return data;
     }
 
-    protected List<T> getByField(Class<T> entityClass, String fieldName, String fieldValue) {
+    protected List<T> getByField(String fieldName, String fieldValue) {
         Transaction transaction = null;
         Session session = db.getCurrentSession();
         List<T> data = Collections.emptyList();
@@ -68,7 +70,7 @@ public abstract class DataClient<T> {
         return data;
     }
 
-    protected T getByUniqueField(Class<T> entityClass, String fieldName, String fieldValue) {
+    protected T getByUniqueField(String fieldName, String fieldValue) {
         Transaction transaction = null;
         Session session = db.getCurrentSession();
         T result = null;

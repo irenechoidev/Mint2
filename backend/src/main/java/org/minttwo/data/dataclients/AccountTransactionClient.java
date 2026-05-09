@@ -16,7 +16,7 @@ public class AccountTransactionClient extends DataClient<AccountTransactionModel
     private final AccountTransactionValidator validator;
 
     public AccountTransactionClient(Db db) {
-        super(db);
+        super(db, AccountTransactionModel.class);
         this.validator = new AccountTransactionValidator();
     }
 
@@ -32,8 +32,7 @@ public class AccountTransactionClient extends DataClient<AccountTransactionModel
     }
 
     public AccountTransactionModel loadById(@NonNull String id) {
-        AccountTransactionModel accountTransaction =
-                this.getById(AccountTransactionModel.class, id);
+        AccountTransactionModel accountTransaction = this.getById(id);
 
         if (accountTransaction == null) {
             String errMessage = String.format("AccountTransaction with id %s not found", id);
@@ -44,6 +43,6 @@ public class AccountTransactionClient extends DataClient<AccountTransactionModel
     }
 
     public List<AccountTransactionModel> loadByAccountId(@NonNull String accountId) {
-        return this.getByField(AccountTransactionModel.class, ACCOUNT_ID_FIELD_NAME, accountId);
+        return this.getByField(ACCOUNT_ID_FIELD_NAME, accountId);
     }
 }
