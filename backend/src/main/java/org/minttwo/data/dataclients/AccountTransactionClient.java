@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class AccountTransactionClient extends DataClient<AccountTransactionModel> {
-    private static final String ACCOUNT_ID_FIELD_NAME = "accountId";
     private final AccountTransactionValidator validator;
 
     public AccountTransactionClient(Db db) {
@@ -43,6 +42,6 @@ public class AccountTransactionClient extends DataClient<AccountTransactionModel
     }
 
     public List<AccountTransactionModel> loadByAccountId(@NonNull String accountId) {
-        return this.getByField(ACCOUNT_ID_FIELD_NAME, accountId);
+        return this.getByField("accountId", accountId);
     }
 }

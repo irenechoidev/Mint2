@@ -13,8 +13,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class UserClient extends DataClient<UserModel> {
-    private static final String USERNAME_FIELD_NAME = "username";
-
     private final UserValidator validator;
     private final PasswordEncoder passwordEncoder;
 
@@ -50,7 +48,7 @@ public class UserClient extends DataClient<UserModel> {
 
     public void loginUser(@NonNull UserModel requestUser) {
         UserModel userModel =
-                this.getByUniqueField(USERNAME_FIELD_NAME, requestUser.getUsername());
+                this.getByUniqueField("username", requestUser.getUsername());
 
         if (userModel == null) {
             String errMessage = "User with username %s not found";
