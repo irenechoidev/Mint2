@@ -25,6 +25,9 @@ public class AccountModel {
     @Column(name = "user_id")
     private String userId;
 
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "balance")
     private Double balance;
 
