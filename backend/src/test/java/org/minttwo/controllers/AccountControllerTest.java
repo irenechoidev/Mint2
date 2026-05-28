@@ -58,6 +58,7 @@ public class AccountControllerTest {
     void testCreateAccount_200() {
         CreateAccountDto createAccountDto = CreateAccountDto.builder()
                 .userId("this-is-user-id")
+                .name("accountName")
                 .build();
 
         subject.createAccount(createAccountDto);
@@ -66,6 +67,7 @@ public class AccountControllerTest {
 
         AccountModel accountModel = accountModelCaptor.getValue();
         assertThat(accountModel.getUserId()).isEqualTo("this-is-user-id");
+        assertThat(accountModel.getName()).isEqualTo("accountName");
     }
 
     @Test
