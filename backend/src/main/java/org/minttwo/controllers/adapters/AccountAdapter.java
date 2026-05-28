@@ -22,6 +22,7 @@ public class AccountAdapter {
     public AccountModel toCreateAccountModel(@NonNull CreateAccountDto createAccountDto) {
         return AccountModel.builder()
                 .userId(createAccountDto.getUserId())
+                .name(createAccountDto.getName())
                 .build();
     }
 
