@@ -234,11 +234,14 @@ components:
       required:
         - id
         - userId
+        - name
         - balance
       properties:
         id:
           type: string
         userId:
+          type: string
+        name:
           type: string
         balance:
           type: number
