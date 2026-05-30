@@ -90,6 +90,7 @@ public class AccountControllerTest {
                         .id("account-id-789")
                         .balance(233.20)
                         .userId("i-am-user-999")
+                        .name("account-name")
                 .build());
 
         String accountId = "account-id-789";
@@ -102,6 +103,7 @@ public class AccountControllerTest {
         assertThat(accountDto.getId()).isEqualTo("account-id-789");
         assertThat(accountDto.getBalance()).isEqualTo(233.20);
         assertThat(accountDto.getUserId()).isEqualTo("i-am-user-999");
+        assertThat(accountDto.getName()).isEqualTo("account-name");
     }
 
     @Test
@@ -122,11 +124,13 @@ public class AccountControllerTest {
                         .id("account-id-123")
                         .balance(2192.0)
                         .userId("i-am-user-999")
+                        .name("account-name-1")
                         .build(),
                 AccountModel.builder()
                         .id("account-id-345")
                         .balance(300.1)
                         .userId("i-am-user-999")
+                        .name("account-name-2")
                         .build()
         ));
 
@@ -142,9 +146,11 @@ public class AccountControllerTest {
         assertThat(firstDto.getId()).isEqualTo("account-id-123");
         assertThat(firstDto.getBalance()).isEqualTo(2192.0);
         assertThat(firstDto.getUserId()).isEqualTo("i-am-user-999");
+        assertThat(firstDto.getName()).isEqualTo("account-name-1");
         assertThat(secondDto.getId()).isEqualTo("account-id-345");
         assertThat(secondDto.getBalance()).isEqualTo(300.1);
         assertThat(secondDto.getUserId()).isEqualTo("i-am-user-999");
+        assertThat(secondDto.getName()).isEqualTo("account-name-2");
     }
 
     @Test
