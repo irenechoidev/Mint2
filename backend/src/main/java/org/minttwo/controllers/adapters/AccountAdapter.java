@@ -14,6 +14,7 @@ public class AccountAdapter {
         return AccountDto.builder()
                 .id(accountModel.getId())
                 .userId(accountModel.getUserId())
+                .name(accountModel.getName())
                 .balance(accountModel.getBalance())
                 .build();
     }
